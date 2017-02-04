@@ -1,14 +1,14 @@
 package org.usfirst.frc.team555.robot;
 
 import org.montclairrobotics.sprocket.SprocketRobot;
-import org.montclairrobotics.sprocket.drive.DriveTrain;
-import org.montclairrobotics.sprocket.drive.DriveTrainBuilder;
-import org.montclairrobotics.sprocket.drive.InvalidDriveTrainException;
-import org.montclairrobotics.sprocket.geometry.Degrees;
-import org.montclairrobotics.sprocket.geometry.Position;
+import org.montclairrobotics.sprocket.control.Button;
+import org.montclairrobotics.sprocket.drive.Motor;
+import org.usfirst.frc.team555.robot.buttons.GearCloseAction;
+import org.usfirst.frc.team555.robot.buttons.GearOpenAction;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.VictorSP;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -19,6 +19,25 @@ import edu.wpi.first.wpilibj.Talon;
  */
 public class Robot extends SprocketRobot {
 	
+	private Joystick driveStick;
+	private Button gearButton;
+	
+	private Motor gearMotor;
+	private DigitalInput openSwitch;
+	private DigitalInput closeSwitch;
+	
+	@Override
+	public void robotInit() {
+		gearMotor = new Motor(new VictorSP(0));
+		openSwitch = new DigitalInput(0);
+		closeSwitch = new DigitalInput(1);
+		
+		driveStick = new Joystick(0);
+		
+		gearButton = new Button(driveStick, 0);
+		gearButton.setHeldAction(new GearOpenAction(gearMotor, openSwitch));
+		gearButton.setOffAction(new GearCloseAction(gearMotor, closeSwitch));
+	}
 	
 }
 
