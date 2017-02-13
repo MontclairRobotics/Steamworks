@@ -57,20 +57,10 @@ public class Robot extends SprocketRobot {
 		openSwitch = new DigitalInput(1);
 		closeSwitch = new DigitalInput(0);
 		
-		Button gearButton = new Button(auxStick, 1);
+		Button gearButton = new Button(driveStick, 1);
 		gearMotor = new Motor(new CANTalon(5));
 		gearButton.setHeldAction(new GearOpenAction(gearMotor, openSwitch));
 		gearButton.setOffAction(new GearCloseAction(gearMotor, closeSwitch));
-		
-		
-		Updater.add(new Updatable() {
-			@Override
-			public void update() {
-				SmartDashboard.putBoolean("switch-opened", openSwitch.get());
-				SmartDashboard.putBoolean("switch-closed", closeSwitch.get());
-			}
-			
-		}, Priority.OUTPUT);
 		
 		builder = new DriveTrainBuilder();
 		builder.addWheels(new XY(-1, 0), Angle.ZERO, new Motor(new CANTalon(3)), new Motor(new CANTalon(4)));
@@ -89,7 +79,6 @@ public class Robot extends SprocketRobot {
 			e.printStackTrace();
 		}
 		
-		//builder.addWheel(motor, offset, force)
 	}
 	
 }
