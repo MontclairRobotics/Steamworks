@@ -1,7 +1,7 @@
 package org.usfirst.frc.team555.robot.buttons;
 
 import org.montclairrobotics.sprocket.control.ButtonAction;
-import org.montclairrobotics.sprocket.drive.Motor;
+import org.montclairrobotics.sprocket.motors.Motor;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 
@@ -20,7 +20,7 @@ public class GearCloseAction extends ButtonAction {
 		if(closeSwitch.get()) {
 			m.set(0.0);
 		} else {
-			m.set(-0.2);
+			m.set(-1);
 		}
 	}
 
