@@ -1,8 +1,11 @@
 package org.usfirst.frc.team555.robot;
 
+import java.util.ArrayList;
+
 import org.montclairrobotics.sprocket.SprocketRobot;
 import org.montclairrobotics.sprocket.control.ArcadeDriveInput;
 import org.montclairrobotics.sprocket.control.Button;
+import org.montclairrobotics.sprocket.control.ButtonAction;
 import org.montclairrobotics.sprocket.control.JoystickYAxis;
 import org.montclairrobotics.sprocket.drive.ControlledMotor;
 import org.montclairrobotics.sprocket.drive.DTPipeline;
@@ -18,7 +21,14 @@ import org.montclairrobotics.sprocket.loop.Priority;
 import org.montclairrobotics.sprocket.loop.Updatable;
 import org.montclairrobotics.sprocket.loop.Updater;
 import org.montclairrobotics.sprocket.motors.Motor;
+import org.montclairrobotics.sprocket.utils.Input;
 import org.montclairrobotics.sprocket.utils.PID;
+import org.montclairrobotics.sprocket.vision.TurnDistanceInput;
+import org.montclairrobotics.sprocket.vision.VisionDTInput;
+import org.montclairrobotics.sprocket.vision.VisionTarget;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team555.robot.buttons.GearCloseAction;
 import org.usfirst.frc.team555.robot.buttons.GearOpenAction;
 
@@ -28,6 +38,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.vision.VisionPipeline;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -79,6 +90,39 @@ public class Robot extends SprocketRobot {
 			e.printStackTrace();
 		}
 		
+		GripPipelineD pipeline=new GripPipelineD();
+		
+		VisionTarget visionTarget=new VisionTarget(pipeline,new Input<TurnDistanceInput>(){
+
+			@Override
+			public TurnDistanceInput get() {
+				ArrayList<MatOfPoint> contours = pipeline.filterContoursOutput();
+				SmartDashboard.putNumber("contours", contours.size());
+				Rect r=Imgproc.boundingRect(contours.get(0));
+				SmartDashboard.putNumber("Rect X",r.x);
+				SmartDashboard.putNumber("Rect Y",r.y);
+				SmartDashboard.putNumber("Rect Width",r.width);
+				SmartDashboard.putNumber("Rect Height",r.height);
+				
+				return new TurnDistanceInput(160-r.x-r.width/2,120-r.y-r.height/2);
+			}}, 320,240);
+		VisionDTInput visionInput=new VisionDTInput(visionTarget,0.01,0.2,0.01,0.2);
+		
+		Button imageLockButton=new Button(0, 5);
+		imageLockButton.setPressAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				SprocketRobot.getDriveTrain().setTempInput(visionInput);
+			}});
+		imageLockButton.setOffAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				SprocketRobot.getDriveTrain().useDefaultInput();
+			}
+			
+		});
 	}
 	
 }
