@@ -65,29 +65,37 @@ public class Robot extends SprocketRobot {
 	
 	@Override
 	public void robotInit() {
+		//Joysticks
 		driveStick = new Joystick(0);
-		
 		auxStick = new Joystick(1);
 		
+		//Gear opened/closed limit switches
 		openSwitch = new DigitalInput(1);
 		closeSwitch = new DigitalInput(0);
 		
+		//Setting up gear trigger
 		Button gearButton = new Button(driveStick, 1);
 		gearMotor = new Motor(new CANTalon(5));
 		gearButton.setHeldAction(new GearOpenAction(gearMotor, openSwitch));
 		gearButton.setOffAction(new GearCloseAction(gearMotor, closeSwitch));
 		
+		//Rope climber motors
 		ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
 		ropeMotor1.getMotor().setInverted(true);
 		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
 		
+		//DriveTrain wheels
 		builder = new DriveTrainBuilder();
+		builder.setDriveTrainType(DriveTrainType.TANK);
 		builder.addWheels(new XY(-1, 0), Angle.ZERO, new Motor(new CANTalon(3)), new Motor(new CANTalon(4)));
 		builder.addWheels(new XY(1, 0), new Degrees(180), new Motor(new CANTalon(1)), new Motor(new CANTalon(2)));
 		
+		//DriveTrain joystick input
 		ArcadeDriveInput input = new ArcadeDriveInput(driveStick);
-		
 		input.setSensitivity(0.5, 0.3);
+		builder.setInput(input);
+		
+		//Full speed button
 		Button fullSpeed = new Button(driveStick, 3);
 		
 		fullSpeed.setPressAction(new ButtonAction() {
@@ -104,15 +112,12 @@ public class Robot extends SprocketRobot {
 		});
 		
 		
-		builder.setInput(input);
-		
+		//Gyro lock
 		NavXRollInput navX = new NavXRollInput(Port.kMXP);
-		
 		PID gyroPID = new PID(1,0,.002);
 		gyroPID.setInput(navX);
-		
 		GyroLock gLock = new GyroLock(gyroPID);
-		
+		//Gyro lock button
 		Button gLockButton = new Button(driveStick, 5);
 		gLockButton.setPressAction(new ButtonAction() {
 			@Override
@@ -128,8 +133,6 @@ public class Robot extends SprocketRobot {
 		});
 		
 		builder.addStep(gLock);
-		
-		builder.setDriveTrainType(DriveTrainType.TANK);
 		
 		try {
 			builder.build();
