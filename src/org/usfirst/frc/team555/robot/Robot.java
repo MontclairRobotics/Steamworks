@@ -59,6 +59,9 @@ public class Robot extends SprocketRobot {
 	private DigitalInput openSwitch;
 	private DigitalInput closeSwitch;
 	
+	private ControlledMotor ropeMotor1;
+	private ControlledMotor ropeMotor2;
+	
 	@Override
 	public void robotInit() {
 		driveStick = new Joystick(0);
@@ -72,6 +75,9 @@ public class Robot extends SprocketRobot {
 		gearMotor = new Motor(new CANTalon(5));
 		gearButton.setHeldAction(new GearOpenAction(gearMotor, openSwitch));
 		gearButton.setOffAction(new GearCloseAction(gearMotor, closeSwitch));
+		
+		ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
+		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
 		
 		builder = new DriveTrainBuilder();
 		builder.addWheels(new XY(-1, 0), Angle.ZERO, new Motor(new CANTalon(3)), new Motor(new CANTalon(4)));
