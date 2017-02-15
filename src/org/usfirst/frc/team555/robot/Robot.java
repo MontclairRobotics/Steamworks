@@ -78,6 +78,7 @@ public class Robot extends SprocketRobot {
 		gearButton.setOffAction(new GearCloseAction(gearMotor, closeSwitch));
 		
 		ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
+		ropeMotor1.getMotor().setInverted(true);
 		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
 		
 		builder = new DriveTrainBuilder();
