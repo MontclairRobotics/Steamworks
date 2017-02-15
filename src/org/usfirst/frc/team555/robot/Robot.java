@@ -36,6 +36,7 @@ import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.vision.VisionPipeline;
@@ -86,7 +87,46 @@ public class Robot extends SprocketRobot {
 		ArcadeDriveInput input = new ArcadeDriveInput(driveStick);
 		
 		input.setSensitivity(0.5, 0.3);
+		Button fullSpeed = new Button(driveStick, 3);
+		
+		fullSpeed.setPressAction(new ButtonAction() {
+			@Override
+			public void onAction() {
+				input.setSensitivity(1.0, 0.5);
+			}
+		});
+		fullSpeed.setReleaseAction(new ButtonAction() {
+			@Override
+			public void onAction() {
+				input.setSensitivity(0.5, 0.3);
+			}
+		});
+		
+		
 		builder.setInput(input);
+		
+		NavXRollInput navX = new NavXRollInput(Port.kMXP);
+		
+		PID gyroPID = new PID(1,0,.002);
+		gyroPID.setInput(navX);
+		
+		GyroLock gLock = new GyroLock(gyroPID);
+		
+		Button gLockButton = new Button(driveStick, 5);
+		gLockButton.setPressAction(new ButtonAction() {
+			@Override
+			public void onAction() {
+				gLock.enable();
+			}
+		});
+		gLockButton.setReleaseAction(new ButtonAction() {
+			@Override
+			public void onAction() {
+				gLock.disable();
+			}
+		});
+		
+		builder.addStep(gLock);
 		
 		builder.setDriveTrainType(DriveTrainType.TANK);
 		
