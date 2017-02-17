@@ -47,11 +47,23 @@ import edu.wpi.first.wpilibj.vision.VisionPipeline;
  */
 public class Robot extends SprocketRobot {
 	
+	private static final int 
+		DriveStickID=0,
+		AuxStickID=1,
+		CloseSwitchID=0,
+		OpenSwitchID=1,
+		GearButtonID=1,
+		FullSpeedButtonID=3,
+		GyroLockButtonID=5,
+		VisionButtonID=8;
+	
+	
+	
 	private Joystick driveStick;
 	private Joystick auxStick;
 	
 	private DriveTrainBuilder builder;
-	private DriveTrain driveTrain;
+	//private DriveTrain driveTrain;
 	
 	private Motor gearMotor;
 	private DigitalInput openSwitch;
@@ -63,15 +75,15 @@ public class Robot extends SprocketRobot {
 	@Override
 	public void robotInit() {
 		//Joysticks
-		driveStick = new Joystick(0);
-		auxStick = new Joystick(1);
+		driveStick = new Joystick(DriveStickID);
+		auxStick = new Joystick(AuxStickID);
 		
 		//Gear opened/closed limit switches
-		openSwitch = new DigitalInput(1);
-		closeSwitch = new DigitalInput(0);
+		openSwitch = new DigitalInput(OpenSwitchID);
+		closeSwitch = new DigitalInput(CloseSwitchID);
 		
 		//Setting up gear trigger
-		Button gearButton = new Button(driveStick, 1);
+		Button gearButton = new Button(driveStick, GearButtonID);
 		gearMotor = new Motor(new CANTalon(5));
 		gearButton.setHeldAction(new GearOpenAction(gearMotor, openSwitch));
 		gearButton.setOffAction(new GearCloseAction(gearMotor, closeSwitch));
@@ -93,7 +105,7 @@ public class Robot extends SprocketRobot {
 		builder.setInput(input);
 		
 		//Full speed button
-		Button fullSpeed = new Button(driveStick, 3);
+		Button fullSpeed = new Button(driveStick, FullSpeedButtonID);
 		
 		fullSpeed.setPressAction(new ButtonAction() {
 			@Override
@@ -115,7 +127,7 @@ public class Robot extends SprocketRobot {
 		gyroPID.setInput(navX);
 		GyroLock gLock = new GyroLock(gyroPID);
 		//Gyro lock button
-		Button gLockButton = new Button(driveStick, 5);
+		Button gLockButton = new Button(driveStick, GyroLockButtonID);
 		gLockButton.setPressAction(new ButtonAction() {
 			@Override
 			public void onAction() {
@@ -131,10 +143,10 @@ public class Robot extends SprocketRobot {
 		
 		builder.addStep(gLock);
 		
-		Button visionButton=new Button(driveStick,8);
+		Button visionButton=new Button(driveStick,VisionButtonID);
 		
 		Vision vision=new Vision();
-		VisionStep visionStep=new VisionStep(160, vision, 0, 0, visionButton);
+		VisionStep visionStep=new VisionStep(160, vision, 0.01, 0.15, visionButton);
 		
 		builder.addStep(visionStep);
 		
