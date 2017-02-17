@@ -114,7 +114,7 @@ public class Robot extends SprocketRobot {
 		
 		//Gyro lock
 		NavXRollInput navX = new NavXRollInput(Port.kMXP);
-		PID gyroPID = new PID(1,0,.002);
+		PID gyroPID = new PID(1,0,.004);
 		gyroPID.setInput(navX);
 		GyroLock gLock = new GyroLock(gyroPID);
 		//Gyro lock button
