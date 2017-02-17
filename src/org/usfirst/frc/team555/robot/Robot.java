@@ -31,6 +31,8 @@ import org.usfirst.frc.team555.robot.buttons.GearOpenAction;
 
 import com.ctre.CANTalon;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI.Port;
@@ -46,7 +48,8 @@ import edu.wpi.first.wpilibj.vision.VisionPipeline;
  * directory.
  */
 public class Robot extends SprocketRobot {
-	
+
+	private static final int IMG_WIDTH = 320,IMG_HEIGHT = 240;
 	private static final int 
 		DriveStickID=0,
 		AuxStickID=1,
@@ -55,7 +58,7 @@ public class Robot extends SprocketRobot {
 		GearButtonID=1,
 		FullSpeedButtonID=3,
 		GyroLockButtonID=5,
-		VisionButtonID=8;
+		VisionButtonID=11;
 	
 	
 	
@@ -123,7 +126,7 @@ public class Robot extends SprocketRobot {
 		
 		//Gyro lock
 		NavXRollInput navX = new NavXRollInput(Port.kMXP);
-		PID gyroPID = new PID(1,0,.004);
+		PID gyroPID = new PID(1,0,.000);
 		gyroPID.setInput(navX);
 		GyroLock gLock = new GyroLock(gyroPID);
 		//Gyro lock button
@@ -141,12 +144,14 @@ public class Robot extends SprocketRobot {
 			}
 		});
 		
-		builder.addStep(gLock);
+		//builder.addStep(gLock);
 		
 		Button visionButton=new Button(driveStick,VisionButtonID);
-		
-		Vision vision=new Vision();
-		VisionStep visionStep=new VisionStep(160, vision, 0.01, 0.15, visionButton);
+
+		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+		Vision vision=new Vision(camera);
+		VisionStep visionStep=new VisionStep(160, vision, -0.0001, 0.15, visionButton);
 		
 		builder.addStep(visionStep);
 		
@@ -157,5 +162,10 @@ public class Robot extends SprocketRobot {
 		}
 	}
 	
+	public void update()
+	{
+		SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
+		
+	}
 }
 

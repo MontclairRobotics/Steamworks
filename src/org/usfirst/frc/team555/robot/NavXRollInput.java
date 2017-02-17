@@ -5,6 +5,7 @@ import org.montclairrobotics.sprocket.utils.Input;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class NavXRollInput extends AHRS implements Input<Double>{
 
@@ -14,7 +15,11 @@ public class NavXRollInput extends AHRS implements Input<Double>{
 
 	@Override
 	public Double get() {
-		return new Double(super.getRoll());
+		SmartDashboard.putNumber("Roll",super.getRoll());
+		SmartDashboard.putNumber("Pitch",super.getPitch());
+		SmartDashboard.putNumber("Yaw",super.getYaw());
+		//SmartDashboard.putNumber("anything", super.)
+		return new Double(super.getYaw());
 	}
 
 }

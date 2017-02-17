@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
 
 public class Vision implements Updatable{
 
-	private static final int IMG_WIDTH = 320,IMG_HEIGHT = 240;
+	private UsbCamera camera;
 	private VisionThread visionThread;
 	private Object imgLock=new Object();
 	private int centerX;
@@ -30,20 +30,28 @@ public class Vision implements Updatable{
 	private int savedX;
 	private int savedY;
 
-	public Vision()
+	public Vision(UsbCamera camera)
 	{
-		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
 	    
 	    visionThread = new VisionThread(camera, new GripPipelineC(), pipeline -> {
-	        if (pipeline.filterContoursOutput().size()>1) {
+	    	int x,y;
+	        if (pipeline.filterContoursOutput().size()>0) {
 	            Rect a = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
-	            Rect b = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));
-	            synchronized (imgLock) {
-	                centerX = a.x + b.x + (a.width + b.width) / 2;
-	                centerY = a.y + b.y + (a.height + b.height) / 2;
-	            }
+	            //Rect b = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));
+	            Rect b=a;
+                x = (a.x + b.x)/2 + (a.width + b.width) / 4;
+                y = (a.y + b.y)/2 + (a.height + b.height) / 4;
+	            
 	        }
+	        else
+	        {
+	        	x=320/2;
+	        	y=240/2;
+	        }
+	        synchronized (imgLock) {
+                centerX = x;
+                centerY = y;
+            }
 	    });
 	    visionThread.start();
 	    
@@ -57,6 +65,7 @@ public class Vision implements Updatable{
 			savedX=centerX;
 			savedY=centerY;
 		}
+		SmartDashboard.putNumber("x", savedX);
 	}
 	public int getX()
 	{
@@ -65,5 +74,10 @@ public class Vision implements Updatable{
 	public int getY()
 	{
 		return savedY;
+	}
+	
+	public void stop()
+	{
+		visionThread.interrupt();
 	}
 }
