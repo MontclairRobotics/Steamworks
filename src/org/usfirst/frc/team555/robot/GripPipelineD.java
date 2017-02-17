@@ -30,6 +30,7 @@ public class GripPipelineD implements VisionPipeline {
 	private Mat blurOutput = new Mat();
 	private ArrayList<MatOfPoint> findContoursOutput = new ArrayList<MatOfPoint>();
 	private ArrayList<MatOfPoint> filterContoursOutput = new ArrayList<MatOfPoint>();
+
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
