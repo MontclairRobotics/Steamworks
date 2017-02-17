@@ -24,7 +24,7 @@ public class Vision implements Updatable{
 
 	private static final int IMG_WIDTH = 320,IMG_HEIGHT = 240;
 	private VisionThread visionThread;
-	private Object imgLock;
+	private Object imgLock=new Object();
 	private int centerX;
 	private int centerY;
 	private int savedX;
