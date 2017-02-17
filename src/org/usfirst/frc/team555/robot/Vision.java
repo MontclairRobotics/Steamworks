@@ -36,11 +36,12 @@ public class Vision implements Updatable{
 	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
 	    
 	    visionThread = new VisionThread(camera, new GripPipelineC(), pipeline -> {
-	        if (!pipeline.filterContoursOutput().isEmpty()) {
-	            Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
+	        if (pipeline.filterContoursOutput().size()>1) {
+	            Rect a = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
+	            Rect b = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));
 	            synchronized (imgLock) {
-	                centerX = r.x + (r.width / 2);
-	                centerY = r.y + (r.height/2);
+	                centerX = a.x + b.x + (a.width + b.width) / 2;
+	                centerY = a.y + b.y + (a.height + b.height) / 2;
 	            }
 	        }
 	    });
