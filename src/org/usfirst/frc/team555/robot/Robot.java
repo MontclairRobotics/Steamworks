@@ -23,9 +23,6 @@ import org.montclairrobotics.sprocket.loop.Updater;
 import org.montclairrobotics.sprocket.motors.Motor;
 import org.montclairrobotics.sprocket.utils.Input;
 import org.montclairrobotics.sprocket.utils.PID;
-import org.montclairrobotics.sprocket.vision.TurnDistanceInput;
-import org.montclairrobotics.sprocket.vision.VisionDTInput;
-import org.montclairrobotics.sprocket.vision.VisionTarget;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
@@ -134,45 +131,18 @@ public class Robot extends SprocketRobot {
 		
 		builder.addStep(gLock);
 		
+		Button visionButton=new Button(driveStick,8);
+		
+		Vision vision=new Vision();
+		VisionStep visionStep=new VisionStep(160, vision, 0, 0, visionButton);
+		
+		builder.addStep(visionStep);
+		
 		try {
 			builder.build();
 		} catch (InvalidDriveTrainException e) {
 			e.printStackTrace();
 		}
-		
-		GripPipelineD pipeline=new GripPipelineD();
-		
-		VisionTarget visionTarget=new VisionTarget(pipeline,new Input<TurnDistanceInput>(){
-
-			@Override
-			public TurnDistanceInput get() {
-				ArrayList<MatOfPoint> contours = pipeline.filterContoursOutput();
-				SmartDashboard.putNumber("contours", contours.size());
-				Rect r=Imgproc.boundingRect(contours.get(0));
-				SmartDashboard.putNumber("Rect X",r.x);
-				SmartDashboard.putNumber("Rect Y",r.y);
-				SmartDashboard.putNumber("Rect Width",r.width);
-				SmartDashboard.putNumber("Rect Height",r.height);
-				
-				return new TurnDistanceInput(160-r.x-r.width/2,120-r.y-r.height/2);
-			}}, 320,240);
-		VisionDTInput visionInput=new VisionDTInput(visionTarget,0.01,0.2,0.01,0.2);
-		
-		Button imageLockButton=new Button(0, 5);
-		imageLockButton.setPressAction(new ButtonAction(){
-
-			@Override
-			public void onAction() {
-				SprocketRobot.getDriveTrain().setTempInput(visionInput);
-			}});
-		imageLockButton.setOffAction(new ButtonAction(){
-
-			@Override
-			public void onAction() {
-				SprocketRobot.getDriveTrain().useDefaultInput();
-			}
-			
-		});
 	}
 	
 }
