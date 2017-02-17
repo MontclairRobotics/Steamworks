@@ -87,8 +87,8 @@ public class Robot extends SprocketRobot {
 		//DriveTrain wheels
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
-		builder.addWheels(new XY(-1, 0), Angle.ZERO, new Motor(new CANTalon(3)), new Motor(new CANTalon(4)));
-		builder.addWheels(new XY(1, 0), new Degrees(180), new Motor(new CANTalon(1)), new Motor(new CANTalon(2)));
+		builder.addWheels(new XY(-13.75, 0), Angle.ZERO, new Motor(new CANTalon(3)), new Motor(new CANTalon(4)));
+		builder.addWheels(new XY(13.75, 0), new Degrees(180), new Motor(new CANTalon(1)), new Motor(new CANTalon(2)));
 		
 		//DriveTrain joystick input
 		ArcadeDriveInput input = new ArcadeDriveInput(driveStick);
