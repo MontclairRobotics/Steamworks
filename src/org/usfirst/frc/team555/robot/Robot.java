@@ -9,6 +9,7 @@ import org.montclairrobotics.sprocket.control.ButtonAction;
 import org.montclairrobotics.sprocket.control.JoystickYAxis;
 import org.montclairrobotics.sprocket.drive.ControlledMotor;
 import org.montclairrobotics.sprocket.drive.DTPipeline;
+import org.montclairrobotics.sprocket.drive.DriveModule;
 import org.montclairrobotics.sprocket.drive.DriveTrain;
 import org.montclairrobotics.sprocket.drive.DriveTrainBuilder;
 import org.montclairrobotics.sprocket.drive.DriveTrainType;
@@ -16,6 +17,7 @@ import org.montclairrobotics.sprocket.drive.InvalidDriveTrainException;
 import org.montclairrobotics.sprocket.drive.steps.GyroLock;
 import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
+import org.montclairrobotics.sprocket.geometry.Distance;
 import org.montclairrobotics.sprocket.geometry.XY;
 import org.montclairrobotics.sprocket.loop.Priority;
 import org.montclairrobotics.sprocket.loop.Updatable;
@@ -60,7 +62,7 @@ public class Robot extends SprocketRobot {
 		GyroLockButtonID=5,
 		VisionButtonID=11;
 	
-	
+	private static final Distance maxSpeed=new Distance(1);
 	
 	private Joystick driveStick;
 	private Joystick auxStick;
@@ -99,8 +101,8 @@ public class Robot extends SprocketRobot {
 		//DriveTrain wheels
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
-		builder.addWheels(new XY(-13.75, 0), Angle.ZERO, new Motor(new CANTalon(3)), new Motor(new CANTalon(4)));
-		builder.addWheels(new XY(13.75, 0), new Degrees(180), new Motor(new CANTalon(1)), new Motor(new CANTalon(2)));
+		builder.addModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
+		builder.addModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 		
 		//DriveTrain joystick input
 		ArcadeDriveInput input = new ArcadeDriveInput(driveStick);
