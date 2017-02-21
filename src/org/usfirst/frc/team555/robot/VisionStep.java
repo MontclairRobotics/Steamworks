@@ -32,7 +32,7 @@ public class VisionStep implements Step<DTTarget>{
 			turn=(target-vision.getX())*turnP;
 			if(Math.abs(turn)<minTurnError)
 				turn=0;
-			return new DTTarget(arg0.getDirection(),turn);
+			return new DTTarget(arg0.getDirection(),new Radians(turn));
 		}
 		return arg0;
 	}
