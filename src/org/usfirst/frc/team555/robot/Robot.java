@@ -96,13 +96,15 @@ public class Robot extends SprocketRobot {
 		//Rope climber motors
 		ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
 		ropeMotor1.getMotor().setInverted(true);
+		ropeMotor1.constrain(0.0, 1.0);
 		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
+		ropeMotor2.constrain(0.0, 1.0);
 		
 		//DriveTrain wheels
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
-		builder.addModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
-		builder.addModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
+		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
+		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 		
 		//DriveTrain joystick input
 		ArcadeDriveInput input = new ArcadeDriveInput(driveStick);
