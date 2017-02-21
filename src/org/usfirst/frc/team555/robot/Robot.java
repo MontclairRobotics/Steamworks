@@ -7,6 +7,7 @@ import org.montclairrobotics.sprocket.control.ArcadeDriveInput;
 import org.montclairrobotics.sprocket.control.Button;
 import org.montclairrobotics.sprocket.control.ButtonAction;
 import org.montclairrobotics.sprocket.control.JoystickYAxis;
+import org.montclairrobotics.sprocket.control.ToggleButton;
 import org.montclairrobotics.sprocket.drive.ControlledMotor;
 import org.montclairrobotics.sprocket.drive.DTPipeline;
 import org.montclairrobotics.sprocket.drive.DriveModule;
@@ -100,20 +101,12 @@ public class Robot extends SprocketRobot {
 		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
 		ropeMotor2.constrain(0.0, 1.0);
 		
-		//DriveTrain wheels
-		builder = new DriveTrainBuilder();
-		builder.setDriveTrainType(DriveTrainType.TANK);
-		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
-		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
-		
 		//DriveTrain joystick input
 		ArcadeDriveInput input = new ArcadeDriveInput(driveStick);
 		input.setSensitivity(0.5, 0.3);
-		builder.setInput(input);
 		
 		//Full speed button
 		Button fullSpeed = new Button(driveStick, FullSpeedButtonID);
-		
 		fullSpeed.setPressAction(new ButtonAction() {
 			@Override
 			public void onAction() {
@@ -127,37 +120,32 @@ public class Robot extends SprocketRobot {
 			}
 		});
 		
-		
 		//Gyro lock
 		NavXRollInput navX = new NavXRollInput(Port.kMXP);
 		PID gyroPID = new PID(1,0,.000);
 		gyroPID.setInput(navX);
 		GyroLock gLock = new GyroLock(gyroPID);
+		
 		//Gyro lock button
-		Button gLockButton = new Button(driveStick, GyroLockButtonID);
-		gLockButton.setPressAction(new ButtonAction() {
-			@Override
-			public void onAction() {
-				gLock.enable();
-			}
-		});
-		gLockButton.setReleaseAction(new ButtonAction() {
-			@Override
-			public void onAction() {
-				gLock.disable();
-			}
-		});
+		new ToggleButton(driveStick, GyroLockButtonID, gLock);
 		
-		//builder.addStep(gLock);
+		builder.addStep(gLock);
 		
+		//Vision
 		Button visionButton=new Button(driveStick,VisionButtonID);
-
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
 		Vision vision=new Vision(camera);
 		VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.0001, 0.15, visionButton);
 		
+		//DriveTrain wheels
+		builder = new DriveTrainBuilder();
+		builder.setDriveTrainType(DriveTrainType.TANK);
+		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
+		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
+		
 		builder.addStep(visionStep);
+		builder.setInput(input);
 		
 		try {
 			builder.build();
