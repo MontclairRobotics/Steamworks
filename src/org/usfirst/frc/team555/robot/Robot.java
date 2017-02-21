@@ -101,8 +101,8 @@ public class Robot extends SprocketRobot {
 		//DriveTrain wheels
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
-		builder.addModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
-		builder.addModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
+		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
+		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 		
 		//DriveTrain joystick input
 		ArcadeDriveInput input = new ArcadeDriveInput(driveStick);
@@ -166,7 +166,7 @@ public class Robot extends SprocketRobot {
 	
 	public void update()
 	{
-		SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
+		SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn());
 		
 	}
 }
