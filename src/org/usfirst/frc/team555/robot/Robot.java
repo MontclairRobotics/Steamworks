@@ -112,7 +112,7 @@ public class Robot extends SprocketRobot {
 		
 		Deadzone deadzone=new Deadzone();
 		
-		AccelLimit accelLimit=new AccelLimit(0.4,0.4*4*Math.PI/180);
+		AccelLimit accelLimit=new AccelLimit(1.2,0.4*4*Math.PI/180);
 		
 		
 		//Full speed button
