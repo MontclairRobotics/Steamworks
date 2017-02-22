@@ -51,7 +51,7 @@ import edu.wpi.first.wpilibj.vision.VisionPipeline;
  */
 public class Robot extends SprocketRobot {
 
-	private static final int IMG_WIDTH = 640,IMG_HEIGHT = 480;
+	private static final int IMG_WIDTH = 320,IMG_HEIGHT = 240;
 	private static final int 
 		DriveStickID=0,
 		AuxStickID=1,
@@ -95,10 +95,13 @@ public class Robot extends SprocketRobot {
 		
 		//Rope climber motors
 		ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
-		ropeMotor1.getMotor().setInverted(true);
 		ropeMotor1.constrain(0.0, 1.0);
+		ropeMotor1.getMotor().setInverted(true);
 		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
 		ropeMotor2.constrain(0.0, 1.0);
+		ropeMotor2.getMotor().setInverted(true);
+		
+		
 		
 		//DriveTrain wheels
 		builder = new DriveTrainBuilder();
@@ -155,7 +158,7 @@ public class Robot extends SprocketRobot {
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
 		Vision vision=new Vision(camera);
-		VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.0001, 0.15, visionButton);
+		VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.005, 0.15, visionButton);
 		
 		builder.addStep(visionStep);
 		

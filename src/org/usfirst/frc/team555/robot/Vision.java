@@ -41,6 +41,7 @@ public class Vision implements Updatable{
 	            Rect b=a;
                 x = (a.x + b.x)/2 + (a.width + b.width) / 4;
                 y = (a.y + b.y)/2 + (a.height + b.height) / 4;
+                x=a.x+a.width/2;
 	            
 	        }
 	        else
