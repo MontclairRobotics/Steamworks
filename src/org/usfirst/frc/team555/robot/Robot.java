@@ -15,6 +15,8 @@ import org.montclairrobotics.sprocket.drive.DriveTrain;
 import org.montclairrobotics.sprocket.drive.DriveTrainBuilder;
 import org.montclairrobotics.sprocket.drive.DriveTrainType;
 import org.montclairrobotics.sprocket.drive.InvalidDriveTrainException;
+import org.montclairrobotics.sprocket.drive.steps.AccelLimit;
+import org.montclairrobotics.sprocket.drive.steps.Deadzone;
 import org.montclairrobotics.sprocket.drive.steps.GyroLock;
 import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
@@ -108,6 +110,11 @@ public class Robot extends SprocketRobot {
 		ArcadeDriveInput input = new ArcadeDriveInput(driveStick);
 		input.setSensitivity(0.5, 0.3);
 		
+		Deadzone deadzone=new Deadzone();
+		
+		AccelLimit accelLimit=new AccelLimit(0.4,0.4*4*Math.PI/180);
+		
+		
 		//Full speed button
 		Button fullSpeed = new Button(driveStick, FullSpeedButtonID);
 		fullSpeed.setPressAction(new ButtonAction() {
@@ -132,8 +139,6 @@ public class Robot extends SprocketRobot {
 		//Gyro lock button
 		new ToggleButton(driveStick, GyroLockButtonID, gLock);
 		
-		builder.addStep(gLock);
-		
 		//Vision
 		Button visionButton=new Button(driveStick,VisionButtonID);
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
@@ -146,9 +151,12 @@ public class Robot extends SprocketRobot {
 		builder.setDriveTrainType(DriveTrainType.TANK);
 		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
 		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
-		
-		builder.addStep(visionStep);
+
 		builder.setInput(input);
+		builder.addStep(deadzone);
+		builder.addStep(accelLimit);
+		builder.addStep(visionStep);
+		builder.addStep(gLock);
 		
 		try {
 			builder.build();
