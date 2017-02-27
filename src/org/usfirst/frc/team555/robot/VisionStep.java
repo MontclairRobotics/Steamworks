@@ -31,7 +31,7 @@ public class VisionStep implements Step<DTTarget>,Togglable{
 		if(enabled)
 		{
 			double visionOutput=vision.getX();
-			if(visionOutput<0||Math.abs(goal-visionOutput)*turnP<minTurnError)
+			if(visionOutput<0||Math.abs(goal-visionOutput)<minTurnError)
 				turn=0;
 			else
 				turn=(goal-visionOutput)*turnP;

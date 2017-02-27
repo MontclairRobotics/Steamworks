@@ -143,7 +143,7 @@ public class Robot extends SprocketRobot {
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
 		Vision vision=new Vision(camera);
-		VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.005, 0.15);
+		VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.0001, 10);
 		
 		new ToggleButton(driveStick, VisionButtonID, visionStep);
 		
@@ -155,9 +155,9 @@ public class Robot extends SprocketRobot {
 
 		builder.setInput(input);
 		builder.addStep(deadzone);
-		//builder.addStep(accelLimit);
+		builder.addStep(accelLimit);
 		builder.addStep(visionStep);
-		//builder.addStep(gLock);
+		builder.addStep(gLock);
 		
 		try {
 			builder.build();

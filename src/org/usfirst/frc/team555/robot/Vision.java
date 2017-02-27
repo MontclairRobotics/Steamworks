@@ -45,7 +45,7 @@ public class Vision implements Updatable{
 	        }
 	        else
 	        {
-	        	x=320/2;
+	        	x=-1;
 	        }
 	        synchronized (imgLock) {
                 centerX = x;
