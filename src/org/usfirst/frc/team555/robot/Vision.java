@@ -33,25 +33,22 @@ public class Vision implements Updatable{
 	public Vision(UsbCamera camera)
 	{
 	    
-	    visionThread = new VisionThread(camera, new GripPipelineC(), pipeline -> {
+	    visionThread = new VisionThread(camera, new RedGripD(), pipeline -> {
 	    	int x,y;
 	        if (pipeline.filterContoursOutput().size()>0) {
 	            Rect a = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
-	            //Rect b = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));
-	            Rect b=a;
+	            /*Rect b = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));
                 x = (a.x + b.x)/2 + (a.width + b.width) / 4;
-                y = (a.y + b.y)/2 + (a.height + b.height) / 4;
+                y = (a.y + b.y)/2 + (a.height + b.height) / 4;*/
                 x=a.x+a.width/2;
 	            
 	        }
 	        else
 	        {
 	        	x=320/2;
-	        	y=240/2;
 	        }
 	        synchronized (imgLock) {
                 centerX = x;
-                centerY = y;
             }
 	    });
 	    visionThread.start();
