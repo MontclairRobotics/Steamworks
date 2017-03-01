@@ -3,10 +3,16 @@ package org.usfirst.frc.team555.robot;
 import java.util.ArrayList;
 
 import org.montclairrobotics.sprocket.SprocketRobot;
+import org.montclairrobotics.sprocket.auto.AutoMode;
+import org.montclairrobotics.sprocket.auto.states.Delay;
+import org.montclairrobotics.sprocket.auto.states.Disable;
+import org.montclairrobotics.sprocket.auto.states.DriveTime;
+import org.montclairrobotics.sprocket.auto.states.Enable;
 import org.montclairrobotics.sprocket.control.ArcadeDriveInput;
 import org.montclairrobotics.sprocket.control.Button;
 import org.montclairrobotics.sprocket.control.ButtonAction;
 import org.montclairrobotics.sprocket.control.JoystickYAxis;
+import org.montclairrobotics.sprocket.control.SquaredDriveInput;
 import org.montclairrobotics.sprocket.control.ToggleButton;
 import org.montclairrobotics.sprocket.drive.ControlledMotor;
 import org.montclairrobotics.sprocket.drive.DTPipeline;
@@ -21,6 +27,7 @@ import org.montclairrobotics.sprocket.drive.steps.GyroLock;
 import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
 import org.montclairrobotics.sprocket.geometry.Distance;
+import org.montclairrobotics.sprocket.geometry.Radians;
 import org.montclairrobotics.sprocket.geometry.XY;
 import org.montclairrobotics.sprocket.loop.Priority;
 import org.montclairrobotics.sprocket.loop.Updatable;
@@ -107,7 +114,7 @@ public class Robot extends SprocketRobot {
 		
 		
 		//DriveTrain joystick input
-		ArcadeDriveInput input = new ArcadeDriveInput(driveStick);
+		ArcadeDriveInput input = new SquaredDriveInput(driveStick);//new ArcadeDriveInput(driveStick);
 		input.setSensitivity(0.5, 0.3);
 		
 		Deadzone deadzone=new Deadzone();
@@ -164,6 +171,20 @@ public class Robot extends SprocketRobot {
 		} catch (InvalidDriveTrainException e) {
 			e.printStackTrace();
 		}
+		
+		
+		AutoMode autoDrive=new AutoMode("AutoDrive", new DriveTime(10,new XY(0,1)));
+		super.addAutoMode(autoDrive);
+		AutoMode autoDrive2=new AutoMode("AutoDrive2",new DriveTime(10,new XY(0,1)),new Delay(5),new DriveTime(5,new XY(0,0.5)));
+		super.addAutoMode(autoDrive2);
+		AutoMode autoVisionTarget=new AutoMode("VisionTest",
+				new DriveTime(10,1),
+				new Enable(visionStep),
+				new DriveTime(5,0.3),
+				new Disable(visionStep));
+		super.addAutoMode(autoVisionTarget);
+		
+		super.sendAutoModes();
 	}
 	
 	public void update()
