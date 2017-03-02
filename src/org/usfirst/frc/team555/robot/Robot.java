@@ -189,7 +189,7 @@ public class Robot extends SprocketRobot {
 	
 	public void update()
 	{
-		SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
+		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
 		
 	}
 }

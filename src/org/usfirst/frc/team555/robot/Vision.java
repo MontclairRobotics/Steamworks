@@ -3,6 +3,7 @@ package org.usfirst.frc.team555.robot;
 import org.montclairrobotics.sprocket.loop.Priority;
 import org.montclairrobotics.sprocket.loop.Updatable;
 import org.montclairrobotics.sprocket.loop.Updater;
+import org.montclairrobotics.sprocket.utils.Debug;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 
@@ -41,6 +42,10 @@ public class Vision implements Updatable{
                 x = (a.x + b.x)/2 + (a.width + b.width) / 4;
                 y = (a.y + b.y)/2 + (a.height + b.height) / 4;*/
                 x=a.x+a.width/2;
+                Debug.msg("Vision X", x);
+                Debug.msg("Vision Y", a.y+a.height/2);
+                Debug.msg("Vision Width", a.width);
+                Debug.msg("Vision Height", a.height);
 	            
 	        }
 	        else
@@ -63,7 +68,7 @@ public class Vision implements Updatable{
 			savedX=centerX;
 			savedY=centerY;
 		}
-		SmartDashboard.putNumber("x", savedX);
+		//SmartDashboard.putNumber("x", savedX);
 	}
 	public int getX()
 	{
