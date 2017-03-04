@@ -8,23 +8,11 @@ import org.montclairrobotics.sprocket.loop.Priority;
 import org.montclairrobotics.sprocket.loop.Updatable;
 import org.montclairrobotics.sprocket.loop.Updater;
 import org.montclairrobotics.sprocket.utils.Debug;
-
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.vision.VisionThread;
-
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.SPI.Port;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.vision.VisionRunner;
 import edu.wpi.first.wpilibj.vision.VisionThread;
 
 public class Vision implements Updatable{
@@ -32,16 +20,14 @@ public class Vision implements Updatable{
 	private UsbCamera camera;
 	private VisionThread visionThread;
 	private Object imgLock=new Object();
-	private int centerX;
-	private int centerY;
-	private int savedX;
-	private int savedY;
+	private double dist;
+	private double savedDist;
 
 	public Vision(UsbCamera camera)
 	{
 	    
 	    visionThread = new VisionThread(camera, new RedGripD(), pipeline -> {
-	    	int x,y;
+	    	double d = 0.0;
 	    	ArrayList<MatOfPoint> contours = pipeline.filterContoursOutput();
 	        if (contours.size()>0) {
 	        	Collections.sort(contours, new Comparator<MatOfPoint>() {
@@ -55,22 +41,20 @@ public class Vision implements Updatable{
 					}
 		    	});
 	            Rect a = Imgproc.boundingRect(contours.get(0));
-	            /*Rect b = Imgproc.boundingRect(contours.get(1));
-                x = (a.x + b.x)/2 + (a.width + b.width) / 4;
-                y = (a.y + b.y)/2 + (a.height + b.height) / 4;*/
-                x=a.x+a.width/2;
-                Debug.msg("Vision X", x);
-                Debug.msg("Vision Y", a.y+a.height/2);
-                Debug.msg("Vision Width", a.width);
-                Debug.msg("Vision Height", a.height);
+	            Rect b = Imgproc.boundingRect(contours.get(1));
+	            double x = Math.pow((a.x + a.width/2) - (b.x + b.width/2), 2);
+	            double y = Math.pow((a.y + a.height/2) - (b.y + b.height/2), 2);
+	            d = Math.sqrt(x + y);
+	            
+	            Debug.num("Dist btwn", d);
 	            
 	        }
 	        else
 	        {
-	        	x=-1;
+	        	d=-1;
 	        }
 	        synchronized (imgLock) {
-                centerX = x;
+                dist = d;
             }
 	    });
 	    visionThread.start();
@@ -82,18 +66,12 @@ public class Vision implements Updatable{
 	{
 		synchronized(imgLock)
 		{
-			savedX=centerX;
-			savedY=centerY;
+			savedDist=dist;
 		}
 		//SmartDashboard.putNumber("x", savedX);
 	}
-	public int getX()
-	{
-		return savedX;
-	}
-	public int getY()
-	{
-		return savedY;
+	public double getDist() {
+		return savedDist;
 	}
 	
 	public void stop()
