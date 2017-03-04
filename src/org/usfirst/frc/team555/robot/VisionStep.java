@@ -6,35 +6,50 @@ import org.montclairrobotics.sprocket.geometry.Radians;
 import org.montclairrobotics.sprocket.geometry.Vector;
 import org.montclairrobotics.sprocket.pipeline.Step;
 import org.montclairrobotics.sprocket.utils.Input;
+import org.montclairrobotics.sprocket.utils.Togglable;
 
-public class VisionStep implements Step<DTTarget>{
+public class VisionStep implements Step<DTTarget>,Togglable{
 
-	private double target;
+	private double goal;
 	private Vision vision;
 	private double turnP;
 	private double minTurnError;
 	private double turn;
-	private Input<Boolean> enabled;
+	private boolean enabled=false;
 	
-	public VisionStep(double target,Vision vision,double turnP,double minTurnError,Input<Boolean> enabled)
+	public VisionStep(double goal,Vision vision,double turnP,double minTurnError)
 	{
-		this.target=target;
+		this.goal=goal;
 		this.vision=vision;
 		this.turnP=turnP;
 		this.minTurnError=minTurnError;
-		this.enabled=enabled;
 	}
+	
 	
 	@Override
 	public DTTarget get(DTTarget arg0) {
-		if(enabled.get())
+		if(enabled)
 		{
-			turn=(target-vision.getX())*turnP;
-			if(Math.abs(turn)<minTurnError)
+			double visionOutput=vision.getX();
+			if(visionOutput<0||Math.abs(goal-visionOutput)<minTurnError)
 				turn=0;
+			else
+				turn=(goal-visionOutput)*turnP;
 			return new DTTarget(arg0.getDirection(),new Radians(turn));
 		}
 		return arg0;
+	}
+
+
+	@Override
+	public void disable() {
+		this.enabled=false;
+	}
+
+
+	@Override
+	public void enable() {
+		this.enabled=true;
 	}
 
 }

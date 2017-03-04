@@ -7,6 +7,8 @@ import java.util.Comparator;
 import org.montclairrobotics.sprocket.loop.Priority;
 import org.montclairrobotics.sprocket.loop.Updatable;
 import org.montclairrobotics.sprocket.loop.Updater;
+import org.montclairrobotics.sprocket.utils.Debug;
+
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
@@ -38,7 +40,7 @@ public class Vision implements Updatable{
 	public Vision(UsbCamera camera)
 	{
 	    
-	    visionThread = new VisionThread(camera, new GripPipelineC(), pipeline -> {
+	    visionThread = new VisionThread(camera, new RedGripD(), pipeline -> {
 	    	int x,y;
 	    	ArrayList<MatOfPoint> contours = pipeline.filterContoursOutput();
 	        if (contours.size()>0) {
@@ -53,20 +55,22 @@ public class Vision implements Updatable{
 					}
 		    	});
 	            Rect a = Imgproc.boundingRect(contours.get(0));
-	            //Rect b = Imgproc.boundingRect(contours.get(1));
-	            Rect b=a;
+	            /*Rect b = Imgproc.boundingRect(contours.get(1));
                 x = (a.x + b.x)/2 + (a.width + b.width) / 4;
-                y = (a.y + b.y)/2 + (a.height + b.height) / 4;
+                y = (a.y + b.y)/2 + (a.height + b.height) / 4;*/
+                x=a.x+a.width/2;
+                Debug.msg("Vision X", x);
+                Debug.msg("Vision Y", a.y+a.height/2);
+                Debug.msg("Vision Width", a.width);
+                Debug.msg("Vision Height", a.height);
 	            
 	        }
 	        else
 	        {
-	        	x=320/2;
-	        	y=240/2;
+	        	x=-1;
 	        }
 	        synchronized (imgLock) {
                 centerX = x;
-                centerY = y;
             }
 	    });
 	    visionThread.start();
@@ -81,7 +85,7 @@ public class Vision implements Updatable{
 			savedX=centerX;
 			savedY=centerY;
 		}
-		SmartDashboard.putNumber("x", savedX);
+		//SmartDashboard.putNumber("x", savedX);
 	}
 	public int getX()
 	{

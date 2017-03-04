@@ -15,9 +15,9 @@ public class NavXRollInput extends AHRS implements Input<Double>{
 
 	@Override
 	public Double get() {
-		SmartDashboard.putNumber("Roll",super.getRoll());
+		/*SmartDashboard.putNumber("Roll",super.getRoll());
 		SmartDashboard.putNumber("Pitch",super.getPitch());
-		SmartDashboard.putNumber("Yaw",super.getYaw());
+		SmartDashboard.putNumber("Yaw",super.getYaw());*/
 		//SmartDashboard.putNumber("anything", super.)
 		return new Double(super.getYaw());
 	}
