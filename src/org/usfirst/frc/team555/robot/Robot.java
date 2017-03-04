@@ -6,8 +6,10 @@ import org.montclairrobotics.sprocket.SprocketRobot;
 import org.montclairrobotics.sprocket.auto.AutoMode;
 import org.montclairrobotics.sprocket.auto.states.Delay;
 import org.montclairrobotics.sprocket.auto.states.Disable;
+import org.montclairrobotics.sprocket.auto.states.DriveEncoders;
 import org.montclairrobotics.sprocket.auto.states.DriveTime;
 import org.montclairrobotics.sprocket.auto.states.Enable;
+import org.montclairrobotics.sprocket.auto.states.TurnGyro;
 import org.montclairrobotics.sprocket.control.ArcadeDriveInput;
 import org.montclairrobotics.sprocket.control.Button;
 import org.montclairrobotics.sprocket.control.ButtonAction;
@@ -184,7 +186,31 @@ public class Robot extends SprocketRobot {
 				new DriveTime(5,0.3),
 				new Disable(visionStep));
 		super.addAutoMode(autoVisionTarget);
+		AutoMode straightStart = new AutoMode("Straight",	new DriveEncoders(new Distance(38.7)), 
+														new Enable(visionStep),
+														new DriveTime(5, new XY(0, 0.3)),
+														new GearOpenStep(),
+														new DriveTime(5, new XY(0, -0.7)),
+														new GearCloseStep(),
+														new Disable(visionStep));
 		
+		AutoMode rightStart = new AutoMode("Right", new DriveEncoders(new Distance(56.22)),
+													new TurnGyro(gyroPID.copy().setTarget(navX.get()-45)),
+													new Enable(visionStep),
+													new DriveTime(5, new XY(0, 0.3)),
+													new GearOpenStep(),
+													new DriveTime(5, new XY(0, -0.7)),
+													new GearCloseStep(),
+													new Disable(visionStep));
+		
+		AutoMode leftStart = new AutoMode("Left", 	new DriveEncoders(new Distance(56.22)),
+													new TurnGyro(gyroPID.copy().setTarget(navX.get()+45)),
+													new Enable(visionStep),
+													new DriveTime(5, new XY(0, 0.3)),
+													new GearOpenStep(),
+													new DriveTime(5, new XY(0, -0.7)),
+													new GearCloseStep(),
+													new Disable(visionStep));
 		super.sendAutoModes();
 	}
 	
