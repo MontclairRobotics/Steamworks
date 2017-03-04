@@ -1,26 +1,11 @@
 package org.usfirst.frc.team555.robot;
 
-import java.util.ArrayList;
-
 import org.montclairrobotics.sprocket.SprocketRobot;
 import org.montclairrobotics.sprocket.auto.AutoMode;
-import org.montclairrobotics.sprocket.auto.states.Delay;
-import org.montclairrobotics.sprocket.auto.states.Disable;
-import org.montclairrobotics.sprocket.auto.states.DriveEncoders;
-import org.montclairrobotics.sprocket.auto.states.DriveTime;
-import org.montclairrobotics.sprocket.auto.states.Enable;
-import org.montclairrobotics.sprocket.auto.states.TurnGyro;
-import org.montclairrobotics.sprocket.control.ArcadeDriveInput;
-import org.montclairrobotics.sprocket.control.Button;
-import org.montclairrobotics.sprocket.control.ButtonAction;
-import org.montclairrobotics.sprocket.control.JoystickButton;
-import org.montclairrobotics.sprocket.control.JoystickYAxis;
-import org.montclairrobotics.sprocket.control.SquaredDriveInput;
-import org.montclairrobotics.sprocket.control.ToggleButton;
+import org.montclairrobotics.sprocket.auto.states.*;
+import org.montclairrobotics.sprocket.control.*;
 import org.montclairrobotics.sprocket.drive.ControlledMotor;
-import org.montclairrobotics.sprocket.drive.DTPipeline;
 import org.montclairrobotics.sprocket.drive.DriveModule;
-import org.montclairrobotics.sprocket.drive.DriveTrain;
 import org.montclairrobotics.sprocket.drive.DriveTrainBuilder;
 import org.montclairrobotics.sprocket.drive.DriveTrainType;
 import org.montclairrobotics.sprocket.drive.InvalidDriveTrainException;
@@ -30,17 +15,9 @@ import org.montclairrobotics.sprocket.drive.steps.GyroLock;
 import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
 import org.montclairrobotics.sprocket.geometry.Distance;
-import org.montclairrobotics.sprocket.geometry.Radians;
 import org.montclairrobotics.sprocket.geometry.XY;
-import org.montclairrobotics.sprocket.loop.Priority;
-import org.montclairrobotics.sprocket.loop.Updatable;
-import org.montclairrobotics.sprocket.loop.Updater;
 import org.montclairrobotics.sprocket.motors.Motor;
-import org.montclairrobotics.sprocket.utils.Input;
 import org.montclairrobotics.sprocket.utils.PID;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Rect;
-import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team555.robot.buttons.GearCloseAction;
 import org.usfirst.frc.team555.robot.buttons.GearOpenAction;
 
@@ -51,9 +28,6 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI.Port;
-import edu.wpi.first.wpilibj.VictorSP;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.vision.VisionPipeline;
 
 /**
  * The VM is configured to automatically run this class, and to call the
