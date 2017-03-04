@@ -20,14 +20,16 @@ public class Vision implements Updatable{
 	private UsbCamera camera;
 	private VisionThread visionThread;
 	private Object imgLock=new Object();
-	private double dist;
-	private double savedDist;
+	private double dist, x, y;
+	private double savedDist, savedX, savedY;
 
 	public Vision(UsbCamera camera)
 	{
 	    
 	    visionThread = new VisionThread(camera, new RedGripD(), pipeline -> {
-	    	double d = 0.0;
+	    	double d = -1;
+	    	double x = -1;
+	    	double y = -1;
 	    	ArrayList<MatOfPoint> contours = pipeline.filterContoursOutput();
 	        if (contours.size()>0) {
 	        	Collections.sort(contours, new Comparator<MatOfPoint>() {
@@ -42,19 +44,25 @@ public class Vision implements Updatable{
 		    	});
 	            Rect a = Imgproc.boundingRect(contours.get(0));
 	            Rect b = Imgproc.boundingRect(contours.get(1));
-	            double x = Math.pow((a.x + a.width/2) - (b.x + b.width/2), 2);
-	            double y = Math.pow((a.y + a.height/2) - (b.y + b.height/2), 2);
-	            d = Math.sqrt(x + y);
+	            double distx = Math.pow((a.x + a.width/2) - (b.x + b.width/2), 2);
+	            double disty = Math.pow((a.y + a.height/2) - (b.y + b.height/2), 2);
+	            d = Math.sqrt(distx + disty);
+	            
+	            x = (a.x + b.x)/2 + (a.width + b.width) / 4;
+                y = (a.y + b.y)/2 + (a.height + b.height) / 4;
+                x=a.x+a.width/2;
+                Debug.msg("Vision X", x);
+                Debug.msg("Vision Y", a.y+a.height/2);
+                Debug.msg("Vision Width", a.width);
+                Debug.msg("Vision Height", a.height);
 	            
 	            Debug.num("Dist btwn", d);
 	            
 	        }
-	        else
-	        {
-	        	d=-1;
-	        }
 	        synchronized (imgLock) {
                 dist = d;
+                this.x = x;
+                this.y = y;
             }
 	    });
 	    visionThread.start();
@@ -67,6 +75,8 @@ public class Vision implements Updatable{
 		synchronized(imgLock)
 		{
 			savedDist=dist;
+			savedX = x;
+			savedY = y;
 		}
 		//SmartDashboard.putNumber("x", savedX);
 	}
@@ -74,6 +84,15 @@ public class Vision implements Updatable{
 		return savedDist;
 	}
 	
+	public double getX() {
+		return savedX;
+		}
+
+	public double getY() {
+		return savedY;
+	}
+
+
 	public void stop()
 	{
 		visionThread.interrupt();
