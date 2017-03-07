@@ -55,7 +55,10 @@ public class Vision implements Updatable{
                 Debug.msg("Vision Y", a.y+a.height/2);
                 Debug.msg("Vision Width", a.width);
                 Debug.msg("Vision Height", a.height);
-	            
+	            Debug.msg("Vision B X", b.x);
+	            Debug.msg("Vision B Y", b.y + b.height/2);
+	            Debug.msg("Vision B Width", b.width);
+	            Debug.msg("Vision B Height", b.height);
 	            Debug.num("Dist btwn", d);
 	            
 	        }
