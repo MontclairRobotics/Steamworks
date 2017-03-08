@@ -73,7 +73,8 @@ public class Robot extends SprocketRobot {
 		//Gear opened/closed limit switches
 		openSwitch = new DigitalInput(OpenSwitchID);
 		closeSwitch = new DigitalInput(CloseSwitchID);
-		
+//rafi was here		
+//now he isnt
 		//Setting up gear trigger
 		Button gearButton = new JoystickButton(driveStick, GearButtonID);
 		gearMotor = new Motor(new CANTalon(5));
@@ -92,13 +93,13 @@ public class Robot extends SprocketRobot {
 		
 		//DriveTrain joystick input
 		ArcadeDriveInput input = new SquaredDriveInput(driveStick);//new ArcadeDriveInput(driveStick);
-		input.setSensitivity(0.5, 0.3);
+		//input.setSensitivity(0.5, 0.3);
 		
 		Deadzone deadzone=new Deadzone();
 		
-		AccelLimit accelLimit=new AccelLimit(1.2,0.4*4*Math.PI/180);
+		AccelLimit accelLimit=new AccelLimit(1.2*4,0.4*4*Math.PI/180*4);
 		
-		
+		/*
 		//Full speed button
 		Button fullSpeed = new JoystickButton(driveStick, FullSpeedButtonID);
 		fullSpeed.setPressAction(new ButtonAction() {
@@ -112,11 +113,11 @@ public class Robot extends SprocketRobot {
 			public void onAction() {
 				input.setSensitivity(0.5, 0.3);
 			}
-		});
+		});*/
 		
 		//Gyro lock
 		NavXRollInput navX = new NavXRollInput(Port.kMXP);
-		PID gyroPID = new PID(1,0,.004);
+		PID gyroPID = new PID(0.18,0,.0003);
 		gyroPID.setInput(navX);
 		GyroLock gLock = new GyroLock(gyroPID);
 		

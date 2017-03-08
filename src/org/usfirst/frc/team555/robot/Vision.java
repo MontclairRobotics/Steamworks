@@ -31,6 +31,7 @@ public class Vision implements Updatable{
 	    	double x = -1;
 	    	double y = -1;
 	    	ArrayList<MatOfPoint> contours = pipeline.filterContoursOutput();
+	    	Debug.msg("Contours found", contours.size());
 	        if (contours.size()>0) {
 	        	Collections.sort(contours, new Comparator<MatOfPoint>() {
 					@Override
@@ -42,7 +43,7 @@ public class Vision implements Updatable{
 						}
 					}
 		    	});
-	            Rect a = Imgproc.boundingRect(contours.get(0));
+	            /*Rect a = Imgproc.boundingRect(contours.get(0));
 	            Rect b = Imgproc.boundingRect(contours.get(1));
 	            double distx = Math.pow((a.x + a.width/2) - (b.x + b.width/2), 2);
 	            double disty = Math.pow((a.y + a.height/2) - (b.y + b.height/2), 2);
@@ -59,6 +60,22 @@ public class Vision implements Updatable{
 	            Debug.msg("Vision B Y", b.y + b.height/2);
 	            Debug.msg("Vision B Width", b.width);
 	            Debug.msg("Vision B Height", b.height);
+	            Debug.num("Dist btwn", d);*/
+	        	
+	        	Rect a = Imgproc.boundingRect(contours.get(0));
+	            //Rect b = Imgproc.boundingRect(contours.get(1));
+	            
+	            //x = (a.x + b.x)/2 + (a.width + b.width) / 4;
+                //y = (a.y + b.y)/2 + (a.height + b.height) / 4;
+                x=a.x+a.width/2;
+                Debug.msg("Vision X", x);
+                Debug.msg("Vision Y", a.y+a.height/2);
+                Debug.msg("Vision Width", a.width);
+                Debug.msg("Vision Height", a.height);
+	            //Debug.msg("Vision B X", b.x);
+	            //Debug.msg("Vision B Y", b.y + b.height/2);
+	            //Debug.msg("Vision B Width", b.width);
+	            //Debug.msg("Vision B Height", b.height);
 	            Debug.num("Dist btwn", d);
 	            
 	        }
