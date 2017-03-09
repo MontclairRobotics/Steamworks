@@ -16,7 +16,13 @@ import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
 import org.montclairrobotics.sprocket.geometry.Distance;
 import org.montclairrobotics.sprocket.geometry.XY;
+import org.montclairrobotics.sprocket.loop.Priority;
+import org.montclairrobotics.sprocket.loop.Updatable;
+import org.montclairrobotics.sprocket.loop.Updater;
 import org.montclairrobotics.sprocket.motors.Motor;
+import org.montclairrobotics.sprocket.motors.SEncoder;
+import org.montclairrobotics.sprocket.motors.Module.MotorInputType;
+import org.montclairrobotics.sprocket.utils.Debug;
 import org.montclairrobotics.sprocket.utils.PID;
 import org.usfirst.frc.team555.robot.buttons.GearCloseAction;
 import org.usfirst.frc.team555.robot.buttons.GearOpenAction;
@@ -28,6 +34,7 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI.Port;
+import edu.wpi.first.wpilibj.SpeedController;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -38,6 +45,8 @@ import edu.wpi.first.wpilibj.SPI.Port;
  */
 public class Robot extends SprocketRobot {
 
+	public static boolean MANUAL_GEAR_CONTROL = false;
+	
 	private static final int IMG_WIDTH = 320,IMG_HEIGHT = 240;
 	private static final int 
 		DriveStickID=0,
@@ -64,6 +73,9 @@ public class Robot extends SprocketRobot {
 	private ControlledMotor ropeMotor1;
 	private ControlledMotor ropeMotor2;
 	
+	private SEncoder enc1;
+	private SEncoder enc2;
+	
 	@Override
 	public void robotInit() {
 		//Joysticks
@@ -73,13 +85,23 @@ public class Robot extends SprocketRobot {
 		//Gear opened/closed limit switches
 		openSwitch = new DigitalInput(OpenSwitchID);
 		closeSwitch = new DigitalInput(CloseSwitchID);
-//rafi was here		
-//now he isnt
+		
 		//Setting up gear trigger
 		Button gearButton = new JoystickButton(driveStick, GearButtonID);
 		gearMotor = new Motor(new CANTalon(5));
 		gearButton.setHeldAction(new GearOpenAction(gearMotor, openSwitch));
 		gearButton.setOffAction(new GearCloseAction(gearMotor, closeSwitch));
+		
+		Button manualGearToggle = new JoystickButton(auxStick, 8);
+		manualGearToggle.setPressAction(new ButtonAction() {
+			@Override
+			public void onAction() {
+				MANUAL_GEAR_CONTROL = !MANUAL_GEAR_CONTROL;
+			}
+		});
+		
+		new ControlledMotor(gearMotor.getMotor(), new JoystickButton(auxStick, 6), new JoystickButton(auxStick, 7));
+		
 		
 		//Rope climber motors
 		ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
@@ -91,8 +113,7 @@ public class Robot extends SprocketRobot {
 		
 		
 		
-		//DriveTrain joystick input
-		ArcadeDriveInput input = new SquaredDriveInput(driveStick);//new ArcadeDriveInput(driveStick);
+
 		//input.setSensitivity(0.5, 0.3);
 		
 		Deadzone deadzone=new Deadzone();
@@ -119,7 +140,11 @@ public class Robot extends SprocketRobot {
 		NavXRollInput navX = new NavXRollInput(Port.kMXP);
 		PID gyroPID = new PID(0.18,0,.0003);
 		gyroPID.setInput(navX);
-		GyroLock gLock = new GyroLock(gyroPID);
+		GyroLock gLock = new GyroLock(gyroPID, false);
+		
+		//DriveTrain joystick input
+		ArcadeDriveInput input = new SquaredDriveInput(driveStick);//new ArcadeDriveInput(driveStick);
+		
 		
 		//Gyro lock button
 		new ToggleButton(driveStick, GyroLockButtonID, gLock);
@@ -128,19 +153,28 @@ public class Robot extends SprocketRobot {
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
 		Vision vision=new Vision(camera);
-		VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.0001, 10);
+		VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.0001, 0, -0.00001, 10);
 		
 		new ToggleButton(driveStick, VisionButtonID, visionStep);
 		
 		//DriveTrain wheels
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
-		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
-		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
+		
+		PID motorPID = new PID(.4, 0, 0);
+		
+		enc1 = new SEncoder(2, 3, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
+		enc2 = new SEncoder(4, 5, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
+		
+		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, enc1, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
+		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, enc2, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
+		//builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO, maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
+		//builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180), maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 
+		
 		builder.setInput(input);
 		builder.addStep(deadzone);
-		builder.addStep(accelLimit);
+		//builder.addStep(accelLimit);
 		builder.addStep(visionStep);
 		builder.addStep(gLock);
 		
@@ -151,7 +185,7 @@ public class Robot extends SprocketRobot {
 		}
 		
 		
-		AutoMode autoDrive=new AutoMode("AutoDrive", new DriveTime(10,new XY(0,1)));
+		AutoMode autoDrive=new AutoMode("AutoDrive", new DriveEncoders(new Distance(50), new Distance(10), 1));
 		super.addAutoMode(autoDrive);
 		AutoMode autoDrive2=new AutoMode("AutoDrive2",new DriveTime(10,new XY(0,1)),new Delay(5),new DriveTime(5,new XY(0,0.5)));
 		super.addAutoMode(autoDrive2);
@@ -161,7 +195,7 @@ public class Robot extends SprocketRobot {
 				new DriveTime(5,0.3),
 				new Disable(visionStep));
 		super.addAutoMode(autoVisionTarget);
-		AutoMode straightStart = new AutoMode("Straight",	new DriveEncoders(new Distance(38.7)), 
+		/*AutoMode straightStart = new AutoMode("Straight",	new DriveEncoders(new Distance(38.7)), 
 														new Enable(visionStep),
 														new DriveTime(5, new XY(0, 0.3)),
 														new GearOpenStep(),
@@ -185,12 +219,19 @@ public class Robot extends SprocketRobot {
 													new GearOpenStep(),
 													new DriveTime(5, new XY(0, -0.7)),
 													new GearCloseStep(),
-													new Disable(visionStep));
+													new Disable(visionStep));*/
 		super.sendAutoModes();
 	}
 	
 	public void update()
 	{
+		Debug.msg("Manual gear control", MANUAL_GEAR_CONTROL ? "true" : "false");
+		Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
+		Debug.msg("Open switch", openSwitch.get() ? "true" : "false");
+		Debug.num("enc1", enc1.getTicks());
+		Debug.num("enc2", enc2.getTicks());
+		Debug.num("enc1 inches", enc1.getInches().get());
+		Debug.num("enc2 inches", enc2.getInches().get());
 		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
 		
 	}

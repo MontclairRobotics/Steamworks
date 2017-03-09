@@ -16,7 +16,7 @@ public class GearCloseStep extends AutoState {
 
 	@Override
 	public void stateUpdate() {
-		gearMotor.set(-1.0);
+		if(!Robot.MANUAL_GEAR_CONTROL) gearMotor.set(-1.0);
 	}
 
 }

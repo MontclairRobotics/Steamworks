@@ -6,6 +6,7 @@ import org.montclairrobotics.sprocket.geometry.Radians;
 import org.montclairrobotics.sprocket.geometry.Vector;
 import org.montclairrobotics.sprocket.pipeline.Step;
 import org.montclairrobotics.sprocket.utils.Input;
+import org.montclairrobotics.sprocket.utils.PID;
 import org.montclairrobotics.sprocket.utils.Togglable;
 
 public class VisionStep implements Step<DTTarget>,Togglable{
@@ -13,15 +14,16 @@ public class VisionStep implements Step<DTTarget>,Togglable{
 	private double goal;
 	private Vision vision;
 	private double turnP;
+	private PID turnPID;
 	private double minTurnError;
 	private double turn;
 	private boolean enabled=false;
 	
-	public VisionStep(double goal,Vision vision,double turnP,double minTurnError)
+	public VisionStep(double goal,Vision vision,double turnP, double turnI, double turnD,double minTurnError)
 	{
 		this.goal=goal;
 		this.vision=vision;
-		this.turnP=turnP;
+		this.turnPID = new PID(turnP, turnI, turnD).setInput(vision).setTarget(goal);
 		this.minTurnError=minTurnError;
 	}
 	
@@ -30,11 +32,7 @@ public class VisionStep implements Step<DTTarget>,Togglable{
 	public DTTarget get(DTTarget arg0) {
 		if(enabled)
 		{
-			double visionOutput=vision.getX();
-			if(visionOutput<0||Math.abs(goal-visionOutput)<minTurnError)
-				turn=0;
-			else
-				turn=(goal-visionOutput)*turnP;
+			turn=turnPID.get();
 			return new DTTarget(arg0.getDirection(),new Radians(turn));
 		}
 		return arg0;

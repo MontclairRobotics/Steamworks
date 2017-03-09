@@ -8,6 +8,7 @@ import org.montclairrobotics.sprocket.loop.Priority;
 import org.montclairrobotics.sprocket.loop.Updatable;
 import org.montclairrobotics.sprocket.loop.Updater;
 import org.montclairrobotics.sprocket.utils.Debug;
+import org.montclairrobotics.sprocket.utils.Input;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
@@ -15,7 +16,7 @@ import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.vision.VisionThread;
 
-public class Vision implements Updatable{
+public class Vision implements Updatable, Input<Double>{
 
 	private UsbCamera camera;
 	private VisionThread visionThread;
@@ -85,8 +86,10 @@ public class Vision implements Updatable{
                 this.y = y;
             }
 	    });
+	    savedX = 0.0;
+	    savedY = 0.0;
+	    savedDist = 0.0;
 	    visionThread.start();
-	    
 	    Updater.add(this, Priority.INPUT);
 	}
 	
@@ -116,5 +119,11 @@ public class Vision implements Updatable{
 	public void stop()
 	{
 		visionThread.interrupt();
+	}
+
+	@Override
+	public Double get() {
+		Debug.num("VisionClass X", getX());
+		return getX();
 	}
 }
