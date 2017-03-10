@@ -94,15 +94,25 @@ public class Robot extends SprocketRobot {
 		gearButton.setHeldAction(new GearOpenAction(gearMotor, openSwitch));
 		gearButton.setOffAction(new GearCloseAction(gearMotor, closeSwitch));
 		
+		final ControlledMotor manualGear=new ControlledMotor(gearMotor.getMotor(), new JoystickButton(auxStick, 6), new JoystickButton(auxStick, 7));
+		
 		Button manualGearToggle = new JoystickButton(auxStick, 8);
 		manualGearToggle.setPressAction(new ButtonAction() {
 			@Override
 			public void onAction() {
 				MANUAL_GEAR_CONTROL = !MANUAL_GEAR_CONTROL;
+				if(MANUAL_GEAR_CONTROL)
+				{
+					manualGear.enable();
+				}
+				else
+				{
+					manualGear.disable();
+				}
 			}
 		});
 		
-		new ControlledMotor(gearMotor.getMotor(), new JoystickButton(auxStick, 6), new JoystickButton(auxStick, 7));
+		
 		
 		
 		//Rope climber motors
