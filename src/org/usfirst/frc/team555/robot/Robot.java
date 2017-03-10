@@ -55,7 +55,7 @@ public class Robot extends SprocketRobot {
 		OpenSwitchID=1,
 		GearButtonID=1,
 		FullSpeedButtonID=3,
-		GyroLockButtonID=5,
+		GyroLockButtonID=12,
 		VisionButtonID=11;
 	
 	private static final Distance maxSpeed=new Distance(1);
