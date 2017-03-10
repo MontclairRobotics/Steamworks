@@ -61,6 +61,8 @@ public class Robot extends SprocketRobot {
 		RightButtonID=4;
 	
 	private static final Distance maxSpeed=new Distance(1);
+
+	private static final Distance ENC_SPEED = new Distance(1);
 	
 	private Joystick driveStick;
 	private Joystick auxStick;
@@ -210,7 +212,7 @@ public class Robot extends SprocketRobot {
 		}
 		
 		
-		AutoMode autoDrive=new AutoMode("AutoDrive", new DriveEncoders(new Distance(50), new Distance(10), 1));
+		AutoMode autoDrive=new AutoMode("AutoDrive", new DriveEncoders(new Distance(50), 0.5,ENC_SPEED));
 		super.addAutoMode(autoDrive);
 		AutoMode autoDrive2=new AutoMode("AutoDrive2",new DriveTime(10,new XY(0,1)),new Delay(5),new DriveTime(5,new XY(0,0.5)));
 		super.addAutoMode(autoDrive2);
@@ -223,7 +225,7 @@ public class Robot extends SprocketRobot {
 		
 		AutoMode gearStraight = new AutoMode("Gear Straight No Vision", 
 				new Enable(gLock),
-				new DriveEncoders(new Distance(40), new Distance(10), 20),
+				new DriveEncoders(new Distance(40), 0.5, ENC_SPEED),
 				new GearOpenState(gearMotor));
 		super.addAutoMode(gearStraight);
 		
