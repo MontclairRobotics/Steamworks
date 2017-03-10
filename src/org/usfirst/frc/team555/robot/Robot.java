@@ -56,7 +56,9 @@ public class Robot extends SprocketRobot {
 		GearButtonID=1,
 		FullSpeedButtonID=3,
 		GyroLockButtonID=11,
-		VisionButtonID=5;
+		VisionButtonID=5,
+		LeftButtonID=3,
+		RightButtonID=4;
 	
 	private static final Distance maxSpeed=new Distance(1);
 	
@@ -142,13 +144,13 @@ public class Robot extends SprocketRobot {
 		gyroPID.setInput(navX);
 		GyroLock gLock = new GyroLock(gyroPID, false);
 		
-		new JoystickButton(driveStick, 2).setPressAction(new ButtonAction() {
+		new JoystickButton(driveStick, LeftButtonID).setPressAction(new ButtonAction() {
 			@Override
 			public void onAction() {
 				gLock.setTargetAngle(gLock.getTargetAngle().add(new Degrees(-5)));
 			}
 		});
-		new JoystickButton(driveStick, 4).setPressAction(new ButtonAction() {
+		new JoystickButton(driveStick, RightButtonID).setPressAction(new ButtonAction() {
 			@Override
 			public void onAction() {
 				gLock.setTargetAngle(gLock.getTargetAngle().add(new Degrees(5)));
