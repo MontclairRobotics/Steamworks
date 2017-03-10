@@ -208,31 +208,13 @@ public class Robot extends SprocketRobot {
 				new DriveTime(5,0.3),
 				new Disable(visionStep));
 		super.addAutoMode(autoVisionTarget);
-		/*AutoMode straightStart = new AutoMode("Straight",	new DriveEncoders(new Distance(38.7)), 
-														new Enable(visionStep),
-														new DriveTime(5, new XY(0, 0.3)),
-														new GearOpenStep(),
-														new DriveTime(5, new XY(0, -0.7)),
-														new GearCloseStep(),
-														new Disable(visionStep));
 		
-		AutoMode rightStart = new AutoMode("Right", new DriveEncoders(new Distance(56.22)),
-													new TurnGyro(gyroPID.copy().setTarget(navX.get()-45)),
-													new Enable(visionStep),
-													new DriveTime(5, new XY(0, 0.3)),
-													new GearOpenStep(),
-													new DriveTime(5, new XY(0, -0.7)),
-													new GearCloseStep(),
-													new Disable(visionStep));
+		AutoMode gearStraight = new AutoMode("Gear Straight No Vision", 
+				new Enable(gLock),
+				new DriveEncoders(new Distance(40), new Distance(10), 20),
+				new GearOpenState(gearMotor));
+		super.addAutoMode(gearStraight);
 		
-		AutoMode leftStart = new AutoMode("Left", 	new DriveEncoders(new Distance(56.22)),
-													new TurnGyro(gyroPID.copy().setTarget(navX.get()+45)),
-													new Enable(visionStep),
-													new DriveTime(5, new XY(0, 0.3)),
-													new GearOpenStep(),
-													new DriveTime(5, new XY(0, -0.7)),
-													new GearCloseStep(),
-													new Disable(visionStep));*/
 		super.sendAutoModes();
 	}
 	
