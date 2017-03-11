@@ -212,10 +212,12 @@ public class Robot extends SprocketRobot {
 		}
 		
 		
-		AutoMode autoDrive=new AutoMode("AutoDrive", new DriveEncoders(new Distance(50), 0.5,ENC_SPEED));
+		AutoMode autoDrive=new AutoMode("AutoDriveEncoders", new DriveEncoders(new Distance(50), 0.5,ENC_SPEED));
 		super.addAutoMode(autoDrive);
-		AutoMode autoDrive2=new AutoMode("AutoDrive2",new DriveTime(10,new XY(0,1)),new Delay(5),new DriveTime(5,new XY(0,0.5)));
-		super.addAutoMode(autoDrive2);
+		AutoMode autoTime=new AutoMode("AutoDriveTime",new DriveTime(10, .5));
+		super.addAutoMode(autoTime);
+		AutoMode autoTurn=new AutoMode("AutoTurn90",new TurnGyro(new Degrees(90),gyroPID.copy(), navX));
+		super.addAutoMode(autoTurn);
 		AutoMode autoVisionTarget=new AutoMode("VisionTest",
 				new DriveTime(10,1),
 				new Enable(visionStep),
@@ -225,9 +227,37 @@ public class Robot extends SprocketRobot {
 		
 		AutoMode gearStraight = new AutoMode("Gear Straight No Vision", 
 				new Enable(gLock),
-				new DriveEncoders(new Distance(40), 0.5, ENC_SPEED),
+				new DriveEncoders(new Distance(110-36), 0.5, ENC_SPEED),
+				new Disable(gLock),
 				new GearOpenState(gearMotor));
+		
+		
 		super.addAutoMode(gearStraight);
+		
+		AutoMode gearTurnLeft = new AutoMode("Gear Turn Left", 
+				new Enable(gLock),
+				new DriveEncoders(new Distance(98), 0.5, ENC_SPEED),
+				new TurnGyro(new Degrees(-60),gyroPID.copy(),navX),
+				new DriveEncoders(new Distance(22), 0.5, ENC_SPEED),
+				new Disable(gLock),
+				new GearOpenState(gearMotor));
+		super.addAutoMode(gearTurnLeft);
+		
+		
+		AutoMode gearTurnRight = new AutoMode("Gear Turn Right", 
+						new Enable(gLock),
+						new DriveEncoders(new Distance(98), 0.5, ENC_SPEED),
+						new TurnGyro(new Degrees(60),gyroPID.copy(),navX),
+						new DriveEncoders(new Distance(22), 0.5, ENC_SPEED),
+						new Disable(gLock),
+						new GearOpenState(gearMotor));
+		super.addAutoMode(gearTurnRight);
+		
+		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(50), 0.5,ENC_SPEED),new Disable(gLock));
+		super.addAutoMode(autoDriveEncLock);
+		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(10, .5),new Disable(gLock));
+		super.addAutoMode(autoTimeLock);
+		
 		
 		super.sendAutoModes();
 	}
@@ -241,6 +271,8 @@ public class Robot extends SprocketRobot {
 		Debug.num("enc2", enc2.getTicks());
 		Debug.num("enc1 inches", enc1.getInches().get());
 		Debug.num("enc2 inches", enc2.getInches().get());
+		Debug.msg("MaxSpeed",getDriveTrain().getMaxSpeed().get()+" IN");
+		Debug.msg("MaxTurn", getDriveTrain().getMaxTurn().toString());
 		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
 		
 	}
