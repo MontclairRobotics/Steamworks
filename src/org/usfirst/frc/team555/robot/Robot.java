@@ -126,7 +126,7 @@ public class Robot extends SprocketRobot {
 					gear.open();
 				}
 			}});
-		manualOpen.setOffAction(new ButtonAction(){
+		manualOpen.setReleaseAction(new ButtonAction(){
 
 			@Override
 			public void onAction() {
@@ -145,7 +145,7 @@ public class Robot extends SprocketRobot {
 					gear.close();
 				}
 			}});
-		manualClose.setOffAction(new ButtonAction(){
+		manualClose.setReleaseAction(new ButtonAction(){
 
 			@Override
 			public void onAction() {
