@@ -5,10 +5,10 @@ import org.montclairrobotics.sprocket.motors.Motor;
 
 public class GearCloseState extends AutoState {
 	
-	private Motor gearMotor;
+private Gear g;
 	
-	public GearCloseState(Motor m) {
-		gearMotor = m;
+	public GearCloseState(Gear g) {
+		this.g=g;
 	}
 	
 	@Override
@@ -17,13 +17,20 @@ public class GearCloseState extends AutoState {
 	}
 	
 	@Override
-	public void userStop() {
-		gearMotor.set(0);
+	public void userStart()
+	{
+		Robot.MANUAL_GEAR_CONTROL=true;
+		g.close();
 	}
-	
 	@Override
-	public void stateUpdate() {
-		gearMotor.set(-1.0);
+	public void userStop() {
+		g.stop();
+		Robot.MANUAL_GEAR_CONTROL=false;
 	}
 
+	@Override
+	public void stateUpdate() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -91,26 +91,75 @@ public class Robot extends SprocketRobot {
 		closeSwitch = new DigitalInput(CloseSwitchID);
 		
 		//Setting up gear trigger
-		Button gearButton = new JoystickButton(driveStick, GearButtonID);
 		gearMotor = new Motor(new CANTalon(5));
-		gearButton.setHeldAction(new GearOpenAction(gearMotor, openSwitch));
-		gearButton.setOffAction(new GearCloseAction(gearMotor, closeSwitch));
+		Gear gear = new Gear(gearMotor,openSwitch,closeSwitch);
 		
-		final ControlledMotor manualGear=new ControlledMotor(gearMotor.getMotor(), new JoystickButton(auxStick, 6), new JoystickButton(auxStick, 7));
+
+		Button gearButton = new JoystickButton(driveStick, GearButtonID);
+		gearButton.setHeldAction(new ButtonAction(){
+			@Override
+			public void onAction() {
+				if(!MANUAL_GEAR_CONTROL)
+				{
+					gear.openLimit();
+				}
+			}});
+		gearButton.setOffAction(new ButtonAction(){
+			@Override
+			public void onAction() {
+				if(!MANUAL_GEAR_CONTROL)
+				{
+					gear.closeLimit();
+				}
+			}});
+		
+		//final ControlledMotor manualGear=new ControlledMotor(gearMotor.getMotor(), new JoystickButton(auxStick, 6), new JoystickButton(auxStick, 7));
+		
+		Button manualOpen=new JoystickButton(auxStick,6);
+		Button manualClose=new JoystickButton(auxStick,7);
+		
+		manualOpen.setPressAction(new ButtonAction(){
+			@Override
+			public void onAction() {
+				if(MANUAL_GEAR_CONTROL)
+				{
+					gear.open();
+				}
+			}});
+		manualOpen.setOffAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				if(MANUAL_GEAR_CONTROL)
+				{
+					gear.stop();
+				}
+			}});
+		
+		
+		manualClose.setPressAction(new ButtonAction(){
+			@Override
+			public void onAction() {
+				if(MANUAL_GEAR_CONTROL)
+				{
+					gear.close();
+				}
+			}});
+		manualClose.setOffAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				if(MANUAL_GEAR_CONTROL)
+				{
+					gear.stop();
+				}
+			}});
 		
 		Button manualGearToggle = new JoystickButton(auxStick, 8);
 		manualGearToggle.setPressAction(new ButtonAction() {
 			@Override
 			public void onAction() {
 				MANUAL_GEAR_CONTROL = !MANUAL_GEAR_CONTROL;
-				if(MANUAL_GEAR_CONTROL)
-				{
-					manualGear.enable();
-				}
-				else
-				{
-					manualGear.disable();
-				}
 			}
 		});
 		
@@ -229,7 +278,7 @@ public class Robot extends SprocketRobot {
 				new Enable(gLock),
 				new DriveEncoders(new Distance(110-36), 0.5, ENC_SPEED),
 				new Disable(gLock),
-				new GearOpenState(gearMotor));
+				new GearOpenState(gear));
 		
 		
 		super.addAutoMode(gearStraight);
@@ -240,7 +289,7 @@ public class Robot extends SprocketRobot {
 				new TurnGyro(new Degrees(-60),gyroPID.copy(),navX),
 				new DriveEncoders(new Distance(22), 0.5, ENC_SPEED),
 				new Disable(gLock),
-				new GearOpenState(gearMotor));
+				new GearOpenState(gear));
 		super.addAutoMode(gearTurnLeft);
 		
 		
@@ -250,7 +299,7 @@ public class Robot extends SprocketRobot {
 						new TurnGyro(new Degrees(60),gyroPID.copy(),navX),
 						new DriveEncoders(new Distance(22), 0.5, ENC_SPEED),
 						new Disable(gLock),
-						new GearOpenState(gearMotor));
+						new GearOpenState(gear));
 		super.addAutoMode(gearTurnRight);
 		
 		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(50), 0.5,ENC_SPEED),new Disable(gLock));
