@@ -25,7 +25,6 @@ public class GearOpenState extends AutoState {
 	@Override
 	public void userStop() {
 		g.stop();
-		Robot.MANUAL_GEAR_CONTROL=false;
 	}
 
 	@Override
