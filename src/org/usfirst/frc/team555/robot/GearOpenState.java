@@ -15,7 +15,12 @@ public class GearOpenState extends AutoState {
 	public boolean isDone() {
 		return this.timeInState() > 1.0;
 	}
-
+	
+	@Override
+	public void userStop() {
+		gearMotor.set(0);
+	}
+	
 	@Override
 	public void stateUpdate() {
 		gearMotor.set(1.0);
