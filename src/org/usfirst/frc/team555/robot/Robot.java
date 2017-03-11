@@ -57,11 +57,11 @@ public class Robot extends SprocketRobot {
 		CloseSwitchID=0,
 		OpenSwitchID=1,
 		GearButtonID=1,
-		FieldCentricButtonID=5,
+		FieldCentricButtonID=3,
 		GyroLockButtonID=11,
-		VisionButtonID=6,
-		LeftButtonID=3,
-		RightButtonID=4;
+		VisionButtonID=4,
+		LeftButtonID=5,
+		RightButtonID=6;
 	
 	private static final Distance maxSpeed=new Distance(1);
 
@@ -82,6 +82,8 @@ public class Robot extends SprocketRobot {
 	
 	private SEncoder enc1;
 	private SEncoder enc2;
+
+	private NavXRollInput navX;
 	
 	@Override
 	public void robotInit() {
@@ -203,7 +205,7 @@ public class Robot extends SprocketRobot {
 		});*/
 		
 		//Gyro lock
-		NavXRollInput navX = new NavXRollInput(Port.kMXP);
+		navX = new NavXRollInput(Port.kMXP);
 		PID gyroPID = new PID(0.18,0,.0003);
 		gyroPID.setInput(navX);
 		GyroLock gLock = new GyroLock(gyroPID, false);
@@ -234,15 +236,23 @@ public class Robot extends SprocketRobot {
 		new ToggleButton(driveStick,FieldCentricButtonID,fieldCentric);
 		
 		//Vision
-		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-		//Vision vision=new Vision(camera);
+		//UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+	    //camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+		/*Vision vision=new Vision(camera);
 		//VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.0001, 0, -0.00001, 10);
 		
-		//new ToggleButton(driveStick, VisionButtonID, visionStep);
+		//new ToggleButton(driveStick, VisionButtonID, visionStep);*/
 		
-		/*CameraServers server=new CameraServers("cam1","cam2");
+		CameraServer server=CameraServer.getInstance();
+		//server.addCamera(new UsbCamera("cam0",0));
+		//server.addCamera(new UsbCamera("cam1",1));
+		server.startAutomaticCapture();
+		server.startAutomaticCapture();
+		//server.startAutomaticCapture(1);
+		
+		/*CameraServers server=new CameraServers("cam0","cam1");
 		server.start();
+		
 		
 		Button frontCam=new JoystickButton(auxStick,11);
 		Button rearCam=new JoystickButton(auxStick,10);
@@ -259,8 +269,8 @@ public class Robot extends SprocketRobot {
 			@Override
 			public void onAction() {
 				server.switchTo(1);
-			}});*/
-		
+			}});
+		*/
 		//DriveTrain wheels
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
@@ -291,10 +301,11 @@ public class Robot extends SprocketRobot {
 		
 		StateMachine dropGear=new StateMachine(
 				new DriveEncoders(new Distance(22),0.25,ENC_SPEED),
+				new DriveTime(1,0.2),
 				new GearOpenState(gear),
 				new Delay(0.5),
-				new DriveEncoders(new Distance(-22),-0.25,ENC_SPEED),
-				new State(){
+				new DriveEncoders(new Distance(-22),-0.25,ENC_SPEED)
+				/*new State(){
 					@Override
 					public boolean isDone() {
 						return true;
@@ -308,7 +319,33 @@ public class Robot extends SprocketRobot {
 					}
 					@Override
 					public void stop() {
-					}});
+					}}*/);
+		
+		
+		class DriveEncodersGyro extends StateMachine
+		{
+			public DriveEncodersGyro(double distance,double speed)
+			{
+				super(
+						new State(){
+							@Override
+							public boolean isDone() {
+								return true;
+							}
+							@Override
+							public void start() {
+								gLock.resetTargetAngle();
+							}
+							@Override
+							public void stateUpdate() {}
+							@Override
+							public void stop() {}
+						},
+						new Enable(gLock),
+						new DriveEncoders(new Distance(distance),speed,ENC_SPEED),
+						new Disable(gLock));
+			}
+		}
 		
 		
 		AutoMode autoDrive=new AutoMode("AutoDriveEncoders", new DriveEncoders(new Distance(50), 0.5,ENC_SPEED));
@@ -319,48 +356,40 @@ public class Robot extends SprocketRobot {
 		super.addAutoMode(autoTurn);
 		
 		AutoMode gearStraightRight = new AutoMode("Gear Straight Then Go Around Right", 
-				new Enable(gLock),
-				new DriveEncoders(new Distance(110-36-22), 0.5, ENC_SPEED),
-				new Disable(gLock),
+				new DriveEncodersGyro(110-36-22, 0.5),
 				dropGear,
 				new TurnGyro(new Degrees(90),gyroPID.copy(),navX),
-				new DriveEncoders(new Distance(60),0.5,ENC_SPEED),
+				new DriveEncodersGyro(60,0.5),
 				new TurnGyro(new Degrees(-90),gyroPID.copy(),navX),
-				new DriveEncoders(new Distance(100),0.5,ENC_SPEED));
+				new DriveEncodersGyro(100,0.5));
 
 		super.addAutoMode(gearStraightRight);
 		
 		AutoMode gearStraightLeft = new AutoMode("Gear Straight Then Go Around Left", 
-				new Enable(gLock),
-				new DriveEncoders(new Distance(110-36-22), 0.5, ENC_SPEED),
-				new Disable(gLock),
+				new DriveEncodersGyro(110-36-22, 0.5),
 				dropGear,
 				new TurnGyro(new Degrees(-90),gyroPID.copy(),navX),
-				new DriveEncoders(new Distance(60),0.5,ENC_SPEED),
+				new DriveEncodersGyro(60,0.5),
 				new TurnGyro(new Degrees(90),gyroPID.copy(),navX),
-				new DriveEncoders(new Distance(100),0.5,ENC_SPEED));
+				new DriveEncodersGyro(100,0.5));
 		
 		super.addAutoMode(gearStraightLeft);
 		
 		AutoMode gearTurnLeft = new AutoMode("Gear Turn Left", 
-				new Enable(gLock),
-				new DriveEncoders(new Distance(98), 0.5, ENC_SPEED),
+				new DriveEncodersGyro(98, 0.5),
 				new TurnGyro(new Degrees(-60),gyroPID.copy(),navX),
-				new Disable(gLock),
 				dropGear,
 				new TurnGyro(new Degrees(60),gyroPID.copy(),navX),
-				new DriveEncoders(new Distance(120),0.5,ENC_SPEED));
+				new DriveEncodersGyro(120,0.5));
 		super.addAutoMode(gearTurnLeft);
 		
 		
 		AutoMode gearTurnRight = new AutoMode("Gear Turn Right", 
-						new Enable(gLock),
-						new DriveEncoders(new Distance(98), 0.5, ENC_SPEED),
+						new DriveEncodersGyro(98, 0.5),
 						new TurnGyro(new Degrees(60),gyroPID.copy(),navX),
-						new Disable(gLock),
 						dropGear,
 						new TurnGyro(new Degrees(-60),gyroPID.copy(),navX),
-						new DriveEncoders(new Distance(120),0.5,ENC_SPEED));
+						new DriveEncodersGyro(120,0.5));
 		super.addAutoMode(gearTurnRight);
 		
 		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(50), 0.5,ENC_SPEED),new Disable(gLock));
@@ -383,6 +412,7 @@ public class Robot extends SprocketRobot {
 		Debug.num("enc2 inches", enc2.getInches().get());
 		Debug.msg("MaxSpeed",getDriveTrain().getMaxSpeed().get()+" IN");
 		Debug.msg("MaxTurn", getDriveTrain().getMaxTurn().toString());
+		Debug.msg("gyroAngle", navX.get());
 		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
 		
 	}
