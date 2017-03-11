@@ -24,6 +24,7 @@ import org.montclairrobotics.sprocket.motors.SEncoder;
 import org.montclairrobotics.sprocket.states.State;
 import org.montclairrobotics.sprocket.states.StateMachine;
 import org.montclairrobotics.sprocket.motors.Module.MotorInputType;
+import org.montclairrobotics.sprocket.utils.CameraServers;
 import org.montclairrobotics.sprocket.utils.Debug;
 import org.montclairrobotics.sprocket.utils.PID;
 import org.usfirst.frc.team555.robot.buttons.GearCloseAction;
@@ -235,10 +236,30 @@ public class Robot extends SprocketRobot {
 		//Vision
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-		Vision vision=new Vision(camera);
-		VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.0001, 0, -0.00001, 10);
+		//Vision vision=new Vision(camera);
+		//VisionStep visionStep=new VisionStep(IMG_WIDTH/2, vision, -0.0001, 0, -0.00001, 10);
 		
-		new ToggleButton(driveStick, VisionButtonID, visionStep);
+		//new ToggleButton(driveStick, VisionButtonID, visionStep);
+		
+		/*CameraServers server=new CameraServers("cam1","cam2");
+		server.start();
+		
+		Button frontCam=new JoystickButton(auxStick,11);
+		Button rearCam=new JoystickButton(auxStick,10);
+		
+		frontCam.setPressAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				server.switchTo(0);
+			}});
+		
+		rearCam.setPressAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				server.switchTo(1);
+			}});*/
 		
 		//DriveTrain wheels
 		builder = new DriveTrainBuilder();
@@ -258,7 +279,7 @@ public class Robot extends SprocketRobot {
 		builder.setInput(input);
 		builder.addStep(deadzone);
 		//builder.addStep(accelLimit);
-		builder.addStep(visionStep);
+		//builder.addStep(visionStep);
 		builder.addStep(gLock);
 		
 		try {
