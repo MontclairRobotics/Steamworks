@@ -362,12 +362,17 @@ public class Robot extends SprocketRobot {
 		AutoMode autoTurn=new AutoMode("AutoTurn90",new TurnGyro(new Degrees(90),gyroPID.copy(), navX));
 		super.addAutoMode(autoTurn);
 		
+		AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
+				new DriveEncodersGyro(110-36-22, 0.35),
+				dropGear);
+		super.addAutoMode(gearStraight);
+		
 		AutoMode gearStraightRight = new AutoMode("Gear Straight Then Go Around Right", 
 				new DriveEncodersGyro(110-36-22, 0.35),
 				dropGear,
 				new TurnGyro(new Degrees(90),gyroPID.copy(),navX),
 				new DriveEncodersGyro(60,0.3),
-				new TurnGyro(new Degrees(-90),gyroPID.copy(),navX),
+				new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
 				new DriveEncodersGyro(100,0.25));
 
 		super.addAutoMode(gearStraightRight);
@@ -377,7 +382,7 @@ public class Robot extends SprocketRobot {
 				dropGear,
 				new TurnGyro(new Degrees(-90),gyroPID.copy(),navX),
 				new DriveEncodersGyro(60,0.35),	
-				new TurnGyro(new Degrees(90),gyroPID.copy(),navX),
+				new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
 				new DriveEncodersGyro(100,0.25));
 		
 		super.addAutoMode(gearStraightLeft);
@@ -386,7 +391,7 @@ public class Robot extends SprocketRobot {
 				new DriveEncodersGyro(98, 0.35),
 				new TurnGyro(new Degrees(-60),gyroPID.copy(),navX),
 				dropGear,
-				new TurnGyro(new Degrees(60),gyroPID.copy(),navX),
+				new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
 				new DriveEncodersGyro(120,0.25));
 		super.addAutoMode(gearTurnLeft);
 		
@@ -395,11 +400,11 @@ public class Robot extends SprocketRobot {
 						new DriveEncodersGyro(98, 0.3),
 						new TurnGyro(new Degrees(60),gyroPID.copy(),navX),
 						dropGear,
-						new TurnGyro(new Degrees(-60),gyroPID.copy(),navX),
+						new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
 						new DriveEncodersGyro(120,0.25));
 		super.addAutoMode(gearTurnRight);
 		
-		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(50), 0.5,ENC_SPEED),new Disable(gLock));
+		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(140), 0.5,ENC_SPEED),new Disable(gLock));
 		super.addAutoMode(autoDriveEncLock);
 		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(10, .5),new Disable(gLock));
 		super.addAutoMode(autoTimeLock);
