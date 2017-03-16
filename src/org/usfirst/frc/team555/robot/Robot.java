@@ -11,7 +11,8 @@ import org.montclairrobotics.sprocket.drive.DriveTrainType;
 import org.montclairrobotics.sprocket.drive.InvalidDriveTrainException;
 import org.montclairrobotics.sprocket.drive.steps.AccelLimit;
 import org.montclairrobotics.sprocket.drive.steps.Deadzone;
-import org.montclairrobotics.sprocket.drive.steps.GyroLock;
+import org.montclairrobotics.sprocket.drive.steps.GyroCorrection;
+import org.montclairrobotics.sprocket.drive.utils.GyroLock;
 import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
 import org.montclairrobotics.sprocket.geometry.Distance;
@@ -27,6 +28,7 @@ import org.montclairrobotics.sprocket.motors.Module.MotorInputType;
 import org.montclairrobotics.sprocket.utils.CameraServers;
 import org.montclairrobotics.sprocket.utils.Debug;
 import org.montclairrobotics.sprocket.utils.PID;
+import org.montclairrobotics.sprocket.utils.TargetablePID;
 import org.usfirst.frc.team555.robot.buttons.GearCloseAction;
 import org.usfirst.frc.team555.robot.buttons.GearOpenAction;
 
@@ -63,7 +65,6 @@ public class Robot extends SprocketRobot {
 		LeftButtonID=5,
 		RightButtonID=6;
 	
-	private static final Distance maxSpeed=new Distance(1);
 
 	private static final Distance ENC_SPEED = new Distance(1);
 	
@@ -207,9 +208,10 @@ public class Robot extends SprocketRobot {
 		
 		//Gyro lock
 		navX = new NavXRollInput(Port.kMXP);
-		PID gyroPID = new PID(0.18,0,.0003);
+		TargetablePID gyroPID = new TargetablePID(0.18,0,.0003);
 		gyroPID.setInput(navX);
-		GyroLock gLock = new GyroLock(gyroPID, false);
+		GyroCorrection gCorrect=new GyroCorrection(navX,gyroPID);
+		GyroLock gLock = new GyroLock(gCorrect);
 		
 		new JoystickButton(driveStick, LeftButtonID).setPressAction(new ButtonAction() {
 			@Override
