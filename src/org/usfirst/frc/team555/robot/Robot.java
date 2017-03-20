@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -276,13 +277,13 @@ public class Robot extends SprocketRobot {
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
 		
-		PID motorPID = new PID(.4, 0, 0);
+		TargetablePID motorPID = new TargetablePID(.4, 0, 0);
 		
 		enc1 = new SEncoder(2, 3, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
 		enc2 = new SEncoder(4, 5, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
 		
-		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, enc1, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
-		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, enc2, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
+		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO, enc1, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
+		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180), enc2, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 		//builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO, maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
 		//builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180), maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 
@@ -291,7 +292,7 @@ public class Robot extends SprocketRobot {
 		builder.addStep(deadzone);
 		//builder.addStep(accelLimit);
 		//builder.addStep(visionStep);
-		builder.addStep(gLock);
+		builder.addStep(gCorrect);
 		
 		try {
 			builder.build();
@@ -343,7 +344,7 @@ public class Robot extends SprocketRobot {
 							}
 							@Override
 							public void start() {
-								gLock.resetTargetAngle();
+								gCorrect.setTargetAngleRelative();
 							}
 							@Override
 							public void stateUpdate() {}
@@ -361,7 +362,7 @@ public class Robot extends SprocketRobot {
 		super.addAutoMode(autoDrive);
 		AutoMode autoTime=new AutoMode("AutoDriveTime",new DriveTime(6, .5));
 		super.addAutoMode(autoTime);
-		AutoMode autoTurn=new AutoMode("AutoTurn90",new TurnGyro(new Degrees(90),gyroPID.copy(), navX));
+		AutoMode autoTurn=new AutoMode("AutoTurn90",new TurnGyro(new Degrees(90),gCorrect, true));
 		super.addAutoMode(autoTurn);
 		
 		AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
@@ -369,12 +370,30 @@ public class Robot extends SprocketRobot {
 				dropGear);
 		super.addAutoMode(gearStraight);
 		
-		AutoMode gearStraightRight = new AutoMode("Gear Straight Then Go Around Right", 
+		AutoMode gearLeft = new AutoMode("Gear left peg",
+				new DriveEncodersGyro((int)SmartDashboard.getNumber("left-leg-1", 110-36-22), (int)SmartDashboard.getNumber("left-drive-speed", .35)),
+				new TurnGyro(new Degrees((int)SmartDashboard.getNumber("left-turn-1", 60)), gCorrect, true),
+				dropGear,
+				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("left-leg-1", 110-36-22), (int)SmartDashboard.getNumber("left-drive-speed", .35)),
+				new TurnGyro(new Degrees(-(int)SmartDashboard.getNumber("left-turn-1", 60)), gCorrect, true),
+				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("left-leg-2", 60), (int)SmartDashboard.getNumber("left-drive-speed", .35))
+						);
+		
+		AutoMode gearRight = new AutoMode("Gear right peg",
+				new DriveEncodersGyro((int)SmartDashboard.getNumber("right-leg-1", 110-36-22), (int)SmartDashboard.getNumber("right-drive-speed", .35)),
+				new TurnGyro(new Degrees((int)SmartDashboard.getNumber("right-turn-1", -60)), gCorrect, true),
+				dropGear,
+				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("right-leg-1", 110-36-22), (int)SmartDashboard.getNumber("right-drive-speed", .35)),
+				new TurnGyro(new Degrees(-(int)SmartDashboard.getNumber("right-turn-1", -60)), gCorrect, true),
+				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("right-leg-2", -60), (int)SmartDashboard.getNumber("right-drive-speed", .35))
+						);
+		
+		/*AutoMode gearStraightRight = new AutoMode("Gear Straight Then Go Around Right", 
 				new DriveEncodersGyro(110-36-22, 0.35),
 				dropGear,
-				new TurnGyro(new Degrees(90),gyroPID.copy(),navX),
+				new TurnGyro(new Degrees(90),gCorrect,true),
 				new DriveEncodersGyro(60,0.3),
-				new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
+				new TurnGyro(new Degrees(-90),gCorrect,true), //TODO: CHECK
 				new DriveEncodersGyro(100,0.25));
 
 		super.addAutoMode(gearStraightRight);
@@ -404,7 +423,7 @@ public class Robot extends SprocketRobot {
 						dropGear,
 						new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
 						new DriveEncodersGyro(120,0.25));
-		super.addAutoMode(gearTurnRight);
+		super.addAutoMode(gearTurnRight);*/
 		
 		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(140), 0.5,ENC_SPEED),new Disable(gLock));
 		super.addAutoMode(autoDriveEncLock);
@@ -424,8 +443,6 @@ public class Robot extends SprocketRobot {
 		Debug.num("enc2", enc2.getTicks());
 		Debug.num("enc1 inches", enc1.getInches().get());
 		Debug.num("enc2 inches", enc2.getInches().get());
-		Debug.msg("MaxSpeed",getDriveTrain().getMaxSpeed().get()+" IN");
-		Debug.msg("MaxTurn", getDriveTrain().getMaxTurn().toString());
 		Debug.msg("gyroAngle", navX.get());
 		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
 		
