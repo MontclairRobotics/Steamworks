@@ -75,12 +75,12 @@ public class Robot extends SprocketRobot {
 	private DriveTrainBuilder builder;
 	//private DriveTrain driveTrain;
 	
-	private Motor gearMotor;
-	private DigitalInput openSwitch;
-	private DigitalInput closeSwitch;
+	//private Motor gearMotor;
+	//private DigitalInput openSwitch;
+	//private DigitalInput closeSwitch;
 	
-	private ControlledMotor ropeMotor1;
-	private ControlledMotor ropeMotor2;
+	//private ControlledMotor ropeMotor1;
+	//private ControlledMotor ropeMotor2;
 	
 	private SEncoder enc1;
 	private SEncoder enc2;
@@ -94,15 +94,15 @@ public class Robot extends SprocketRobot {
 		auxStick = new Joystick(AuxStickID);
 		
 		//Gear opened/closed limit switches
-		openSwitch = new DigitalInput(OpenSwitchID);
-		closeSwitch = new DigitalInput(CloseSwitchID);
+		//openSwitch = new DigitalInput(OpenSwitchID);
+		//closeSwitch = new DigitalInput(CloseSwitchID);
 		
 		//Setting up gear trigger
-		gearMotor = new Motor(new CANTalon(5));
-		Gear gear = new Gear(gearMotor,openSwitch,closeSwitch);
+		//gearMotor = new Motor(new CANTalon(5));
+		//Gear gear = new Gear(gearMotor,openSwitch,closeSwitch);
 		
 
-		Button gearButton = new JoystickButton(driveStick, GearButtonID);
+		/*Button gearButton = new JoystickButton(driveStick, GearButtonID);
 		gearButton.setHeldAction(new ButtonAction(){
 			@Override
 			public void onAction() {
@@ -180,7 +180,7 @@ public class Robot extends SprocketRobot {
 		ropeMotor1.getMotor().setInverted(true);
 		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
 		ropeMotor2.constrain(0.0, 1.0);
-		ropeMotor2.getMotor().setInverted(true);
+		ropeMotor2.getMotor().setInverted(true);*/
 		
 		
 		
@@ -309,7 +309,7 @@ public class Robot extends SprocketRobot {
 				MANUAL_GEAR_CONTROL=true;
 			}});
 		
-		StateMachine dropGear=new StateMachine(
+		/*StateMachine dropGear=new StateMachine(
 				new DriveEncoders(new Distance(22),0.2,ENC_SPEED),
 				new DriveTime(0.8,0.1),
 				new GearOpenState(gear),
@@ -329,7 +329,7 @@ public class Robot extends SprocketRobot {
 					}
 					@Override
 					public void stop() {
-					}}*/);
+					}});*/
 		
 		
 		class DriveEncodersGyro extends StateMachine
@@ -365,7 +365,7 @@ public class Robot extends SprocketRobot {
 		AutoMode autoTurn=new AutoMode("AutoTurn90",new TurnGyro(new Degrees(90),gCorrect, true));
 		super.addAutoMode(autoTurn);
 		
-		AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
+		/*AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
 				new DriveEncodersGyro(110-36-22, 0.35),
 				dropGear);
 		super.addAutoMode(gearStraight);
@@ -439,8 +439,8 @@ public class Robot extends SprocketRobot {
 	public void update()
 	{
 		Debug.msg("Manual gear control", MANUAL_GEAR_CONTROL ? "true" : "false");
-		Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
-		Debug.msg("Open switch", openSwitch.get() ? "true" : "false");
+		//Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
+		//Debug.msg("Open switch", openSwitch.get() ? "true" : "false");
 		Debug.num("enc1", enc1.getTicks());
 		Debug.num("enc2", enc2.getTicks());
 		Debug.num("enc1 inches", enc1.getInches().get());
