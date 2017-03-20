@@ -378,6 +378,7 @@ public class Robot extends SprocketRobot {
 				new TurnGyro(new Degrees(-(int)SmartDashboard.getNumber("left-turn-1", 60)), gCorrect, true),
 				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("left-leg-2", 60), (int)SmartDashboard.getNumber("left-drive-speed", .35))
 						);
+		super.addAutoMode(gearLeft);
 		
 		AutoMode gearRight = new AutoMode("Gear right peg",
 				new DriveEncodersGyro((int)SmartDashboard.getNumber("right-leg-1", 110-36-22), (int)SmartDashboard.getNumber("right-drive-speed", .35)),
@@ -387,6 +388,7 @@ public class Robot extends SprocketRobot {
 				new TurnGyro(new Degrees(-(int)SmartDashboard.getNumber("right-turn-1", -60)), gCorrect, true),
 				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("right-leg-2", -60), (int)SmartDashboard.getNumber("right-drive-speed", .35))
 						);
+		super.addAutoMode(gearRight);
 		
 		/*AutoMode gearStraightRight = new AutoMode("Gear Straight Then Go Around Right", 
 				new DriveEncodersGyro(110-36-22, 0.35),
