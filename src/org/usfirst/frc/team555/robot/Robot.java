@@ -209,7 +209,7 @@ public class Robot extends SprocketRobot {
 		
 		//Gyro lock
 		navX = new NavXRollInput(Port.kMXP);
-		TargetablePID gyroPID = new TargetablePID(0.18,0,.0003);
+		TargetablePID gyroPID = new TargetablePID(0.18*4.17,0,.0003*4.17);
 		gyroPID.setInput(navX);
 		GyroCorrection gCorrect=new GyroCorrection(navX,gyroPID);
 		GyroLock gLock = new GyroLock(gCorrect);
@@ -278,7 +278,6 @@ public class Robot extends SprocketRobot {
 		builder.setDriveTrainType(DriveTrainType.TANK);
 		
 		TargetablePID motorPID = new TargetablePID(.4, 0, 0);
-		
 		enc1 = new SEncoder(2, 3, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
 		enc2 = new SEncoder(4, 5, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
 		
@@ -441,8 +440,10 @@ public class Robot extends SprocketRobot {
 		Debug.msg("Manual gear control", MANUAL_GEAR_CONTROL ? "true" : "false");
 		//Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
 		//Debug.msg("Open switch", openSwitch.get() ? "true" : "false");
-		Debug.num("enc1", enc1.getTicks());
-		Debug.num("enc2", enc2.getTicks());
+		Debug.num("enc1 speed", enc1.get());
+		Debug.num("enc2 speed", enc2.get());
+		Debug.num("enc1 raw dist", enc1.getTicks());
+		Debug.num("enc2 raw dist", enc2.getTicks());
 		Debug.num("enc1 inches", enc1.getInches().get());
 		Debug.num("enc2 inches", enc2.getInches().get());
 		Debug.msg("gyroAngle", navX.get());
