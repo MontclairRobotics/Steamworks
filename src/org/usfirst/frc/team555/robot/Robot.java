@@ -4,40 +4,30 @@ import org.montclairrobotics.sprocket.SprocketRobot;
 import org.montclairrobotics.sprocket.auto.AutoMode;
 import org.montclairrobotics.sprocket.auto.states.*;
 import org.montclairrobotics.sprocket.control.*;
-import org.montclairrobotics.sprocket.drive.ControlledMotor;
 import org.montclairrobotics.sprocket.drive.DriveModule;
 import org.montclairrobotics.sprocket.drive.DriveTrainBuilder;
 import org.montclairrobotics.sprocket.drive.DriveTrainType;
 import org.montclairrobotics.sprocket.drive.InvalidDriveTrainException;
 import org.montclairrobotics.sprocket.drive.steps.AccelLimit;
 import org.montclairrobotics.sprocket.drive.steps.Deadzone;
-import org.montclairrobotics.sprocket.drive.steps.GyroLock;
+import org.montclairrobotics.sprocket.drive.steps.GyroCorrection;
+import org.montclairrobotics.sprocket.drive.utils.GyroLock;
 import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
 import org.montclairrobotics.sprocket.geometry.Distance;
 import org.montclairrobotics.sprocket.geometry.XY;
-import org.montclairrobotics.sprocket.loop.Priority;
-import org.montclairrobotics.sprocket.loop.Updatable;
-import org.montclairrobotics.sprocket.loop.Updater;
 import org.montclairrobotics.sprocket.motors.Motor;
 import org.montclairrobotics.sprocket.motors.SEncoder;
 import org.montclairrobotics.sprocket.states.State;
 import org.montclairrobotics.sprocket.states.StateMachine;
 import org.montclairrobotics.sprocket.motors.Module.MotorInputType;
-import org.montclairrobotics.sprocket.utils.CameraServers;
 import org.montclairrobotics.sprocket.utils.Debug;
 import org.montclairrobotics.sprocket.utils.PID;
-import org.usfirst.frc.team555.robot.buttons.GearCloseAction;
-import org.usfirst.frc.team555.robot.buttons.GearOpenAction;
-
 import com.ctre.CANTalon;
 
-import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI.Port;
-import edu.wpi.first.wpilibj.SpeedController;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -63,7 +53,6 @@ public class Robot extends SprocketRobot {
 		LeftButtonID=5,
 		RightButtonID=6;
 	
-	private static final Distance maxSpeed=new Distance(1);
 
 	private static final Distance ENC_SPEED = new Distance(1);
 	
@@ -73,15 +62,15 @@ public class Robot extends SprocketRobot {
 	private DriveTrainBuilder builder;
 	//private DriveTrain driveTrain;
 	
-	private Motor gearMotor;
-	private DigitalInput openSwitch;
-	private DigitalInput closeSwitch;
+	//private Motor gearMotor;
+	//private DigitalInput openSwitch;
+	//private DigitalInput closeSwitch;
 	
-	private ControlledMotor ropeMotor1;
-	private ControlledMotor ropeMotor2;
+	//private ControlledMotor ropeMotor1;
+	//private ControlledMotor ropeMotor2;
 	
-	private SEncoder enc1;
-	private SEncoder enc2;
+	private SEncoder encRight;
+	private SEncoder encLeft;
 
 	private NavXRollInput navX;
 	
@@ -92,15 +81,15 @@ public class Robot extends SprocketRobot {
 		auxStick = new Joystick(AuxStickID);
 		
 		//Gear opened/closed limit switches
-		openSwitch = new DigitalInput(OpenSwitchID);
-		closeSwitch = new DigitalInput(CloseSwitchID);
+		//openSwitch = new DigitalInput(OpenSwitchID);
+		//closeSwitch = new DigitalInput(CloseSwitchID);
 		
 		//Setting up gear trigger
-		gearMotor = new Motor(new CANTalon(5));
-		Gear gear = new Gear(gearMotor,openSwitch,closeSwitch);
+		//gearMotor = new Motor(new CANTalon(5));
+		//Gear gear = new Gear(gearMotor,openSwitch,closeSwitch);
 		
 
-		Button gearButton = new JoystickButton(driveStick, GearButtonID);
+		/*Button gearButton = new JoystickButton(driveStick, GearButtonID);
 		gearButton.setHeldAction(new ButtonAction(){
 			@Override
 			public void onAction() {
@@ -178,7 +167,7 @@ public class Robot extends SprocketRobot {
 		ropeMotor1.getMotor().setInverted(true);
 		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
 		ropeMotor2.constrain(0.0, 1.0);
-		ropeMotor2.getMotor().setInverted(true);
+		ropeMotor2.getMotor().setInverted(true);*/
 		
 		
 		
@@ -207,9 +196,10 @@ public class Robot extends SprocketRobot {
 		
 		//Gyro lock
 		navX = new NavXRollInput(Port.kMXP);
-		PID gyroPID = new PID(0.18,0,.0003);
+		PID gyroPID = new PID(0.18*13.75,0,.0003*13.75);
 		gyroPID.setInput(navX);
-		GyroLock gLock = new GyroLock(gyroPID, false);
+		GyroCorrection gCorrect=new GyroCorrection(navX,gyroPID);
+		GyroLock gLock = new GyroLock(gCorrect);
 		
 		new JoystickButton(driveStick, LeftButtonID).setPressAction(new ButtonAction() {
 			@Override
@@ -274,13 +264,12 @@ public class Robot extends SprocketRobot {
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
 		
-		PID motorPID = new PID(.4, 0, 0);
+		PID motorPID = new PID(0.6, 0, 0);
+		encRight = new SEncoder(2, 3, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
+		encLeft = new SEncoder(4, 5, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
 		
-		enc1 = new SEncoder(2, 3, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
-		enc2 = new SEncoder(4, 5, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
-		
-		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO,maxSpeed, enc1, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
-		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180),maxSpeed, enc2, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
+		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO, encLeft, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
+		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180), encRight, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 		//builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO, maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
 		//builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180), maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 
@@ -289,7 +278,7 @@ public class Robot extends SprocketRobot {
 		builder.addStep(deadzone);
 		//builder.addStep(accelLimit);
 		//builder.addStep(visionStep);
-		builder.addStep(gLock);
+		builder.addStep(gCorrect);
 		
 		try {
 			builder.build();
@@ -306,7 +295,7 @@ public class Robot extends SprocketRobot {
 				MANUAL_GEAR_CONTROL=true;
 			}});
 		
-		StateMachine dropGear=new StateMachine(
+		/*StateMachine dropGear=new StateMachine(
 				new DriveEncoders(new Distance(22),0.2,ENC_SPEED),
 				new DriveTime(0.8,0.1),
 				new GearOpenState(gear),
@@ -326,7 +315,7 @@ public class Robot extends SprocketRobot {
 					}
 					@Override
 					public void stop() {
-					}}*/);
+					}});*/
 		
 		
 		class DriveEncodersGyro extends StateMachine
@@ -341,7 +330,7 @@ public class Robot extends SprocketRobot {
 							}
 							@Override
 							public void start() {
-								gLock.resetTargetAngle();
+								gCorrect.setTargetAngleRelative();
 							}
 							@Override
 							public void stateUpdate() {}
@@ -359,20 +348,40 @@ public class Robot extends SprocketRobot {
 		super.addAutoMode(autoDrive);
 		AutoMode autoTime=new AutoMode("AutoDriveTime",new DriveTime(6, .5));
 		super.addAutoMode(autoTime);
-		AutoMode autoTurn=new AutoMode("AutoTurn90",new TurnGyro(new Degrees(90),gyroPID.copy(), navX));
+		AutoMode autoTurn=new AutoMode("AutoTurn90",new TurnGyro(new Degrees(90),gCorrect, true));
 		super.addAutoMode(autoTurn);
 		
-		AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
+		/*AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
 				new DriveEncodersGyro(110-36-22, 0.35),
 				dropGear);
 		super.addAutoMode(gearStraight);
 		
-		AutoMode gearStraightRight = new AutoMode("Gear Straight Then Go Around Right", 
+		AutoMode gearLeft = new AutoMode("Gear left peg",
+				new DriveEncodersGyro((int)SmartDashboard.getNumber("left-leg-1", 110-36-22), (int)SmartDashboard.getNumber("left-drive-speed", .35)),
+				new TurnGyro(new Degrees((int)SmartDashboard.getNumber("left-turn-1", 60)), gCorrect, true),
+				dropGear,
+				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("left-leg-1", 110-36-22), (int)SmartDashboard.getNumber("left-drive-speed", .35)),
+				new TurnGyro(new Degrees(-(int)SmartDashboard.getNumber("left-turn-1", 60)), gCorrect, true),
+				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("left-leg-2", 60), (int)SmartDashboard.getNumber("left-drive-speed", .35))
+						);
+		super.addAutoMode(gearLeft);
+		
+		AutoMode gearRight = new AutoMode("Gear right peg",
+				new DriveEncodersGyro((int)SmartDashboard.getNumber("right-leg-1", 110-36-22), (int)SmartDashboard.getNumber("right-drive-speed", .35)),
+				new TurnGyro(new Degrees((int)SmartDashboard.getNumber("right-turn-1", -60)), gCorrect, true),
+				dropGear,
+				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("right-leg-1", 110-36-22), (int)SmartDashboard.getNumber("right-drive-speed", .35)),
+				new TurnGyro(new Degrees(-(int)SmartDashboard.getNumber("right-turn-1", -60)), gCorrect, true),
+				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("right-leg-2", -60), (int)SmartDashboard.getNumber("right-drive-speed", .35))
+						);
+		super.addAutoMode(gearRight);
+		
+		/*AutoMode gearStraightRight = new AutoMode("Gear Straight Then Go Around Right", 
 				new DriveEncodersGyro(110-36-22, 0.35),
 				dropGear,
-				new TurnGyro(new Degrees(90),gyroPID.copy(),navX),
+				new TurnGyro(new Degrees(90),gCorrect,true),
 				new DriveEncodersGyro(60,0.3),
-				new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
+				new TurnGyro(new Degrees(-90),gCorrect,true), //TODO: CHECK
 				new DriveEncodersGyro(100,0.25));
 
 		super.addAutoMode(gearStraightRight);
@@ -402,7 +411,7 @@ public class Robot extends SprocketRobot {
 						dropGear,
 						new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
 						new DriveEncodersGyro(120,0.25));
-		super.addAutoMode(gearTurnRight);
+		super.addAutoMode(gearTurnRight);*/
 		
 		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(140), 0.5,ENC_SPEED),new Disable(gLock));
 		super.addAutoMode(autoDriveEncLock);
@@ -411,19 +420,21 @@ public class Robot extends SprocketRobot {
 		
 		
 		super.sendAutoModes();
+		
 	}
 	
 	public void update()
 	{
 		Debug.msg("Manual gear control", MANUAL_GEAR_CONTROL ? "true" : "false");
-		Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
-		Debug.msg("Open switch", openSwitch.get() ? "true" : "false");
-		Debug.num("enc1", enc1.getTicks());
-		Debug.num("enc2", enc2.getTicks());
-		Debug.num("enc1 inches", enc1.getInches().get());
-		Debug.num("enc2 inches", enc2.getInches().get());
-		Debug.msg("MaxSpeed",getDriveTrain().getMaxSpeed().get()+" IN");
-		Debug.msg("MaxTurn", getDriveTrain().getMaxTurn().toString());
+		//Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
+		//Debug.msg("Open switch", openSwitch.get() ? "true" : "false");
+		
+		Debug.num("encRight speed", encRight.get());
+		Debug.num("encLeft speed", encLeft.get());
+		Debug.num("encRight raw dist", encRight.getTicks());
+		Debug.num("encLeft raw dist", encLeft.getTicks());
+		Debug.num("encRight inches", encRight.getInches().get());
+		Debug.num("encLeft inches", encLeft.getInches().get());
 		Debug.msg("gyroAngle", navX.get());
 		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
 		
