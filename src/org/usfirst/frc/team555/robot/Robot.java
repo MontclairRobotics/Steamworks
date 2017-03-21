@@ -4,7 +4,6 @@ import org.montclairrobotics.sprocket.SprocketRobot;
 import org.montclairrobotics.sprocket.auto.AutoMode;
 import org.montclairrobotics.sprocket.auto.states.*;
 import org.montclairrobotics.sprocket.control.*;
-import org.montclairrobotics.sprocket.drive.ControlledMotor;
 import org.montclairrobotics.sprocket.drive.DriveModule;
 import org.montclairrobotics.sprocket.drive.DriveTrainBuilder;
 import org.montclairrobotics.sprocket.drive.DriveTrainType;
@@ -17,30 +16,18 @@ import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
 import org.montclairrobotics.sprocket.geometry.Distance;
 import org.montclairrobotics.sprocket.geometry.XY;
-import org.montclairrobotics.sprocket.loop.Priority;
-import org.montclairrobotics.sprocket.loop.Updatable;
-import org.montclairrobotics.sprocket.loop.Updater;
 import org.montclairrobotics.sprocket.motors.Motor;
 import org.montclairrobotics.sprocket.motors.SEncoder;
 import org.montclairrobotics.sprocket.states.State;
 import org.montclairrobotics.sprocket.states.StateMachine;
 import org.montclairrobotics.sprocket.motors.Module.MotorInputType;
-import org.montclairrobotics.sprocket.utils.CameraServers;
 import org.montclairrobotics.sprocket.utils.Debug;
 import org.montclairrobotics.sprocket.utils.PID;
-import org.montclairrobotics.sprocket.utils.TargetablePID;
-import org.usfirst.frc.team555.robot.buttons.GearCloseAction;
-import org.usfirst.frc.team555.robot.buttons.GearOpenAction;
-
 import com.ctre.CANTalon;
 
-import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI.Port;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -209,7 +196,7 @@ public class Robot extends SprocketRobot {
 		
 		//Gyro lock
 		navX = new NavXRollInput(Port.kMXP);
-		TargetablePID gyroPID = new TargetablePID(0.18*4.17,0,.0003*4.17);
+		PID gyroPID = new PID(0.18*4.17,0,.0003*4.17);
 		gyroPID.setInput(navX);
 		GyroCorrection gCorrect=new GyroCorrection(navX,gyroPID);
 		GyroLock gLock = new GyroLock(gCorrect);
@@ -277,7 +264,7 @@ public class Robot extends SprocketRobot {
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
 		
-		TargetablePID motorPID = new TargetablePID(.4, 0, 0);
+		PID motorPID = new PID(.4, 0, 0);
 		enc1 = new SEncoder(2, 3, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
 		enc2 = new SEncoder(4, 5, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
 		

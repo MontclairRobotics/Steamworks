@@ -7,7 +7,6 @@ import org.montclairrobotics.sprocket.geometry.Vector;
 import org.montclairrobotics.sprocket.pipeline.Step;
 import org.montclairrobotics.sprocket.utils.Input;
 import org.montclairrobotics.sprocket.utils.PID;
-import org.montclairrobotics.sprocket.utils.TargetablePID;
 import org.montclairrobotics.sprocket.utils.Togglable;
 
 public class VisionStep implements Step<DTTarget>,Togglable{
@@ -24,7 +23,7 @@ public class VisionStep implements Step<DTTarget>,Togglable{
 	{
 		this.goal=goal;
 		this.vision=vision;
-		this.turnPID = new TargetablePID(turnP, turnI, turnD).setInput(vision).setTarget(goal);
+		this.turnPID = new PID(turnP, turnI, turnD).setInput(vision).setTarget(goal);
 		this.minTurnError=minTurnError;
 	}
 	
