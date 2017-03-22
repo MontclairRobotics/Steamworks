@@ -11,6 +11,7 @@ import org.montclairrobotics.sprocket.drive.InvalidDriveTrainException;
 import org.montclairrobotics.sprocket.drive.steps.AccelLimit;
 import org.montclairrobotics.sprocket.drive.steps.Deadzone;
 import org.montclairrobotics.sprocket.drive.steps.GyroCorrection;
+import org.montclairrobotics.sprocket.drive.steps.SpeedLimiter;
 import org.montclairrobotics.sprocket.drive.utils.GyroLock;
 import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
@@ -264,9 +265,10 @@ public class Robot extends SprocketRobot {
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
 		
-		PID motorPID = new PID(0.6, 0, 0);
-		encRight = new SEncoder(2, 3, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
-		encLeft = new SEncoder(4, 5, 5865/76.25/*952.0/(6.0*Math.PI)*/, true);
+		//PID motorPID = new PID(0.5, 0.05, 0);
+		PID motorPID = new PID(0, 0, 0);
+		encRight = new SEncoder(2, 3, /*5865/76.25/*952.0/(6.0*Math.PI)*/18208/239.4, true);
+		encLeft = new SEncoder(4, 5, /*5865/76.25/*952.0/(6.0*Math.PI)*/18208/239.4, true);
 		
 		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO, encLeft, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
 		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180), encRight, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
@@ -429,7 +431,7 @@ public class Robot extends SprocketRobot {
 		//Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
 		//Debug.msg("Open switch", openSwitch.get() ? "true" : "false");
 		
-		Debug.num("encRight speed", encRight.get());
+		Debug.num("encRight speed", -encRight.get());
 		Debug.num("encLeft speed", encLeft.get());
 		Debug.num("encRight raw dist", encRight.getTicks());
 		Debug.num("encLeft raw dist", encLeft.getTicks());
