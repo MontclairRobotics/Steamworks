@@ -276,11 +276,19 @@ public class Robot extends SprocketRobot {
 		//builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180), maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 
 		
+
+		
+		
+		
 		builder.setInput(input);
 		builder.addStep(deadzone);
 		//builder.addStep(accelLimit);
 		//builder.addStep(visionStep);
 		builder.addStep(gCorrect);
+		
+		//YOU BETTER REMEMBER TO REMOVE THIS AT SOME POINT RAFI
+		SpeedLimiter limiter = new SpeedLimiter(0.2);
+		builder.addStep(limiter);
 		
 		try {
 			builder.build();
@@ -415,11 +423,43 @@ public class Robot extends SprocketRobot {
 						new DriveEncodersGyro(120,0.25));
 		super.addAutoMode(gearTurnRight);*/
 		
-		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(140), 0.5,ENC_SPEED),new Disable(gLock));
+		
+		
+		
+		
+		
+		State resetGyro=new State(){
+
+			@Override
+			public boolean isDone() {
+				return true;
+			}
+
+			@Override
+			public void start() {
+				gCorrect.reset();
+			}
+
+			@Override
+			public void stateUpdate() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void stop() {
+				// TODO Auto-generated method stub
+				
+			}};
+		
+		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(-96+6.3), 0.5,ENC_SPEED),new Disable(gLock));
 		super.addAutoMode(autoDriveEncLock);
 		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(10, .5),new Disable(gLock));
 		super.addAutoMode(autoTimeLock);
-		
+		AutoMode autoTurnTest90=new AutoMode("Auto Turn 90",resetGyro,new Enable(limiter),new TurnGyro(Angle.QUARTER,gCorrect,false),new Disable(limiter));
+		super.addAutoMode(autoTurnTest90);
+		AutoMode autoTurnTest45=new AutoMode("Auto Turn 45",resetGyro,new Enable(limiter),new TurnGyro(new Degrees(45),gCorrect,false),new Disable(limiter));
+		super.addAutoMode(autoTurnTest45);
 		
 		super.sendAutoModes();
 		
