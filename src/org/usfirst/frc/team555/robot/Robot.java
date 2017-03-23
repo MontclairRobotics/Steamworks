@@ -288,10 +288,6 @@ public class Robot extends SprocketRobot {
 		//builder.addStep(visionStep);
 		builder.addStep(gCorrect);
 		
-		//YOU BETTER REMEMBER TO REMOVE THIS AT SOME POINT RAFI
-		TurnLimiter limiter = new TurnLimiter(0.25);
-		builder.addStep(limiter);
-		
 		try {
 			builder.build();
 		} catch (InvalidDriveTrainException e) {
@@ -456,18 +452,23 @@ public class Robot extends SprocketRobot {
 		
 		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(-96+6.3), 0.5,ENC_SPEED),new Disable(gLock));
 		super.addAutoMode(autoDriveEncLock);
-		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(SmartDashboard.getNumber("auto-time-lock", 10), .5),new Disable(gLock));
+		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(new DashboardInput("auto-time", 10.0), .5),new Disable(gLock));
 		super.addAutoMode(autoTimeLock);
-		AutoMode autoTurnTest90=new AutoMode("Auto Turn 90 With Bugfix",resetGyro,new Enable(limiter),new TurnGyro(Angle.QUARTER,gCorrect,false),new Disable(limiter));
+		AutoMode autoTurnTest90=new AutoMode("Auto Turn 90 With Bugfix",resetGyro,new TurnGyro(Angle.QUARTER,gCorrect,false));
 		super.addAutoMode(autoTurnTest90);
-		AutoMode autoTurnTest45=new AutoMode("Auto Turn 45",resetGyro,new Enable(limiter),new TurnGyro(new Degrees(45),gCorrect,false),new Disable(limiter));
+		AutoMode autoTurnTest45=new AutoMode("Auto Turn 45",resetGyro,new TurnGyro(new Degrees(45),gCorrect,false));
 		super.addAutoMode(autoTurnTest45);
 		
 		AutoMode testRoutine=new AutoMode("Auto Test Routine",
 				new Enable(gLock),new DriveEncoders(new Distance(5*-12+6.3),0.5,ENC_SPEED),new Disable(gLock),
-				new Enable(limiter),new TurnGyro(new Degrees(45),gCorrect,false),new Disable(limiter),
+				new TurnGyro(new Degrees(45),gCorrect,true),
 				new Enable(gLock),new DriveEncoders(new Distance(2*-12+6.3),0.5,ENC_SPEED),new Disable(gLock));
 		super.addAutoMode(testRoutine);
+		
+		AutoMode testEncodersGyro=new AutoMode("TestEncodersGyro",resetGyro,
+				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.ZERO,false,0.5,ENC_SPEED,gCorrect),
+				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.QUARTER,false,0.5,ENC_SPEED,gCorrect));
+		super.addAutoMode(testEncodersGyro);
 		
 		super.sendAutoModes();
 		
