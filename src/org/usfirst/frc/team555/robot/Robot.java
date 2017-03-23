@@ -12,6 +12,7 @@ import org.montclairrobotics.sprocket.drive.steps.AccelLimit;
 import org.montclairrobotics.sprocket.drive.steps.Deadzone;
 import org.montclairrobotics.sprocket.drive.steps.GyroCorrection;
 import org.montclairrobotics.sprocket.drive.steps.SpeedLimiter;
+import org.montclairrobotics.sprocket.drive.steps.TurnLimiter;
 import org.montclairrobotics.sprocket.drive.utils.GyroLock;
 import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
@@ -29,6 +30,7 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -265,8 +267,8 @@ public class Robot extends SprocketRobot {
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
 		
-		//PID motorPID = new PID(0.5, 0.05, 0);
-		PID motorPID = new PID(0, 0, 0);
+		PID motorPID = new PID(0.5, 0.05, 0);
+		//PID motorPID = new PID(0, 0, 0);
 		encRight = new SEncoder(2, 3, /*5865/76.25/*952.0/(6.0*Math.PI)*/18208/239.4, true);
 		encLeft = new SEncoder(4, 5, /*5865/76.25/*952.0/(6.0*Math.PI)*/18208/239.4, true);
 		
@@ -287,7 +289,7 @@ public class Robot extends SprocketRobot {
 		builder.addStep(gCorrect);
 		
 		//YOU BETTER REMEMBER TO REMOVE THIS AT SOME POINT RAFI
-		SpeedLimiter limiter = new SpeedLimiter(0.2);
+		TurnLimiter limiter = new TurnLimiter(0.25);
 		builder.addStep(limiter);
 		
 		try {
@@ -454,12 +456,18 @@ public class Robot extends SprocketRobot {
 		
 		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(-96+6.3), 0.5,ENC_SPEED),new Disable(gLock));
 		super.addAutoMode(autoDriveEncLock);
-		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(10, .5),new Disable(gLock));
+		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(SmartDashboard.getNumber("auto-time-lock", 10), .5),new Disable(gLock));
 		super.addAutoMode(autoTimeLock);
-		AutoMode autoTurnTest90=new AutoMode("Auto Turn 90",resetGyro,new Enable(limiter),new TurnGyro(Angle.QUARTER,gCorrect,false),new Disable(limiter));
+		AutoMode autoTurnTest90=new AutoMode("Auto Turn 90 With Bugfix",resetGyro,new Enable(limiter),new TurnGyro(Angle.QUARTER,gCorrect,false),new Disable(limiter));
 		super.addAutoMode(autoTurnTest90);
 		AutoMode autoTurnTest45=new AutoMode("Auto Turn 45",resetGyro,new Enable(limiter),new TurnGyro(new Degrees(45),gCorrect,false),new Disable(limiter));
 		super.addAutoMode(autoTurnTest45);
+		
+		AutoMode testRoutine=new AutoMode("Auto Test Routine",
+				new Enable(gLock),new DriveEncoders(new Distance(5*-12+6.3),0.5,ENC_SPEED),new Disable(gLock),
+				new Enable(limiter),new TurnGyro(new Degrees(45),gCorrect,false),new Disable(limiter),
+				new Enable(gLock),new DriveEncoders(new Distance(2*-12+6.3),0.5,ENC_SPEED),new Disable(gLock));
+		super.addAutoMode(testRoutine);
 		
 		super.sendAutoModes();
 		
