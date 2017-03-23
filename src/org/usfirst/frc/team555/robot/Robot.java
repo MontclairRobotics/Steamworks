@@ -467,7 +467,9 @@ public class Robot extends SprocketRobot {
 		
 		AutoMode testEncodersGyro=new AutoMode("TestEncodersGyro",resetGyro,
 				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.ZERO,false,0.5,ENC_SPEED,gCorrect),
-				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.QUARTER,false,0.5,ENC_SPEED,gCorrect));
+				new DriveEncoderGyro(new Distance(2*-12+6.3),Angle.QUARTER,false,0.5,ENC_SPEED,gCorrect),
+				new DriveEncoderGyro(new Distance(2*-12+6.3),new Degrees(45),true,0.5,ENC_SPEED,gCorrect),
+				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.ZERO,false,0.5,ENC_SPEED,gCorrect));
 		super.addAutoMode(testEncodersGyro);
 		
 		super.sendAutoModes();
