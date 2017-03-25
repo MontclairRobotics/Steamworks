@@ -58,8 +58,8 @@ public class Robot extends SprocketRobot {
 	
 
 	private static final Distance ENC_SPEED = new Distance(1);
-	private static final double MAX_ENC_ACCEL = 0.0;
-	private static final double MAX_ENC_TICKS = 0.0;
+	private static final double MAX_ENC_ACCEL = 13;
+	private static final double MAX_ENC_TICKS = 25;
 	
 	private Joystick driveStick;
 	private Joystick auxStick;
