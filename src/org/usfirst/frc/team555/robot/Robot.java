@@ -326,31 +326,6 @@ public class Robot extends SprocketRobot {
 					}});*/
 		
 		
-		class DriveEncodersGyro extends StateMachine
-		{
-			public DriveEncodersGyro(double distance,double speed)
-			{
-				super(
-						new State(){
-							@Override
-							public boolean isDone() {
-								return true;
-							}
-							@Override
-							public void start() {
-								gCorrect.setTargetAngleRelative();
-							}
-							@Override
-							public void stateUpdate() {}
-							@Override
-							public void stop() {}
-						},
-						new Enable(gLock),
-						new DriveEncoders(new Distance(distance),speed,ENC_SPEED),
-						new Disable(gLock));
-			}
-		}
-		
 		
 		AutoMode autoDrive=new AutoMode("AutoDriveEncoders", new DriveEncoders(new Distance(50), 0.5,ENC_SPEED));
 		super.addAutoMode(autoDrive);
@@ -360,71 +335,29 @@ public class Robot extends SprocketRobot {
 		super.addAutoMode(autoTurn);
 		
 		/*AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
-				new DriveEncodersGyro(110-36-22, 0.35),
+				new DriveEncoderGyro(new Distance(110-36-22), 0.35, ENC_SPEED, gCorrect),
 				dropGear);
-		super.addAutoMode(gearStraight);
+		super.addAutoMode(gearStraight);*/
 		
-		AutoMode gearLeft = new AutoMode("Gear left peg",
-				new DriveEncodersGyro((int)SmartDashboard.getNumber("left-leg-1", 110-36-22), (int)SmartDashboard.getNumber("left-drive-speed", .35)),
-				new TurnGyro(new Degrees((int)SmartDashboard.getNumber("left-turn-1", 60)), gCorrect, true),
+		/*AutoMode gearLeft = new AutoMode("Gear left peg",
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), ENC_SPEED, gCorrect),
+				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
 				dropGear,
-				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("left-leg-1", 110-36-22), (int)SmartDashboard.getNumber("left-drive-speed", .35)),
-				new TurnGyro(new Degrees(-(int)SmartDashboard.getNumber("left-turn-1", 60)), gCorrect, true),
-				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("left-leg-2", 60), (int)SmartDashboard.getNumber("left-drive-speed", .35))
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), ENC_SPEED, gCorrect),
+				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
+				new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), ENC_SPEED, gCorrect)
 						);
 		super.addAutoMode(gearLeft);
 		
 		AutoMode gearRight = new AutoMode("Gear right peg",
-				new DriveEncodersGyro((int)SmartDashboard.getNumber("right-leg-1", 110-36-22), (int)SmartDashboard.getNumber("right-drive-speed", .35)),
-				new TurnGyro(new Degrees((int)SmartDashboard.getNumber("right-turn-1", -60)), gCorrect, true),
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), ENC_SPEED, gCorrect),
+				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
 				dropGear,
-				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("right-leg-1", 110-36-22), (int)SmartDashboard.getNumber("right-drive-speed", .35)),
-				new TurnGyro(new Degrees(-(int)SmartDashboard.getNumber("right-turn-1", -60)), gCorrect, true),
-				new DriveEncodersGyro(-(int)SmartDashboard.getNumber("right-leg-2", -60), (int)SmartDashboard.getNumber("right-drive-speed", .35))
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), ENC_SPEED, gCorrect),
+				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
+				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35))
 						);
-		super.addAutoMode(gearRight);
-		
-		/*AutoMode gearStraightRight = new AutoMode("Gear Straight Then Go Around Right", 
-				new DriveEncodersGyro(110-36-22, 0.35),
-				dropGear,
-				new TurnGyro(new Degrees(90),gCorrect,true),
-				new DriveEncodersGyro(60,0.3),
-				new TurnGyro(new Degrees(-90),gCorrect,true), //TODO: CHECK
-				new DriveEncodersGyro(100,0.25));
-
-		super.addAutoMode(gearStraightRight);
-		
-		AutoMode gearStraightLeft = new AutoMode("Gear Straight Then Go Around Left", 
-				new DriveEncodersGyro(110-36-22, 0.5),
-				dropGear,
-				new TurnGyro(new Degrees(-90),gyroPID.copy(),navX),
-				new DriveEncodersGyro(60,0.35),	
-				new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
-				new DriveEncodersGyro(100,0.25));
-		
-		super.addAutoMode(gearStraightLeft);
-		
-		AutoMode gearTurnLeft = new AutoMode("Gear Turn Left", 
-				new DriveEncodersGyro(98, 0.35),
-				new TurnGyro(new Degrees(-60),gyroPID.copy(),navX),
-				dropGear,
-				new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
-				new DriveEncodersGyro(120,0.25));
-		super.addAutoMode(gearTurnLeft);
-		
-		
-		AutoMode gearTurnRight = new AutoMode("Gear Turn Right", 
-						new DriveEncodersGyro(98, 0.3),
-						new TurnGyro(new Degrees(60),gyroPID.copy(),navX),
-						dropGear,
-						new TurnGyro(new Degrees(0),gyroPID.copy(),navX),
-						new DriveEncodersGyro(120,0.25));
-		super.addAutoMode(gearTurnRight);*/
-		
-		
-		
-		
-		
+		super.addAutoMode(gearRight);*/
 		
 		State resetGyro=new State(){
 
