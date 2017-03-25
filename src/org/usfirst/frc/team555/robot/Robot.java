@@ -357,7 +357,7 @@ public class Robot extends SprocketRobot {
 				dropGear,
 				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
 				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
-				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect)
+				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect )
 						);
 		super.addAutoMode(gearRight);*/
 		
