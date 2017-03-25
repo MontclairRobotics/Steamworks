@@ -67,4 +67,28 @@ public class Gear {
 		m1.set(0.0);
 		m2.set(0.0);
 	}
+	//6,7   10,11
+	public void open1() {
+		m1.set(1.0);
+	}
+	
+	public void close1() {
+		m1.set(-1.0);
+	}
+	
+	public void stop1() {
+		m1.set(0.0);
+	}
+	
+	public void open2() {
+		m2.set(1.0);
+	}
+	
+	public void close2() {
+		m2.set(-1.0);
+	}
+	
+	public void stop2() {
+		m2.set(0.0);
+	}
 }

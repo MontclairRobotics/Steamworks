@@ -28,6 +28,7 @@ import org.montclairrobotics.sprocket.utils.PID;
 import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -67,9 +68,8 @@ public class Robot extends SprocketRobot {
 	private DriveTrainBuilder builder;
 	//private DriveTrain driveTrain;
 	
-	//private Motor gearMotor;
-	//private DigitalInput openSwitch;
-	//private DigitalInput closeSwitch;
+	private Motor gear1Motor, gear2Motor;
+	private DigitalInput open1Switch, close1Switch, open2Switch, close2Switch;
 	
 	//private ControlledMotor ropeMotor1;
 	//private ControlledMotor ropeMotor2;
@@ -90,8 +90,9 @@ public class Robot extends SprocketRobot {
 		//closeSwitch = new DigitalInput(CloseSwitchID);
 		
 		//Setting up gear trigger
-		//gearMotor = new Motor(new CANTalon(5));
-		//Gear gear = new Gear(gearMotor,openSwitch,closeSwitch);
+		//gear1Motor = new Motor(new CANTalon(5));
+		//gear2Motor = new Motor(new CANTalon(6));
+		//Gear gear = new Gear(gear1Motor,open1Switch,close1Switch, gear2Motor, open2Switch, close2Switch);
 		
 
 		/*Button gearButton = new JoystickButton(driveStick, GearButtonID);
@@ -112,46 +113,86 @@ public class Robot extends SprocketRobot {
 				}
 			}});
 		
-		//final ControlledMotor manualGear=new ControlledMotor(gearMotor.getMotor(), new JoystickButton(auxStick, 6), new JoystickButton(auxStick, 7));
+		//final ControlledMotor manualGear=new ControlledMotor(gearMotor.getMotor(), new JoystickButton(auxStick, 6), new JoystickButton(auxStick, 7));*/
 		
 		
-		Button manualOpen=new JoystickButton(auxStick,6);
-		Button manualClose=new JoystickButton(auxStick,7);
+		/*Button manual1Open=new JoystickButton(auxStick,6);
+		Button manual1Close=new JoystickButton(auxStick,7);
 		
-		manualOpen.setPressAction(new ButtonAction(){
+		Button manual2Open = new JoystickButton(auxStick, 10);
+		Button manual2Close = new JoystickButton(auxStick, 11);
+		
+		manual1Open.setPressAction(new ButtonAction(){
 			@Override
 			public void onAction() {
 				if(MANUAL_GEAR_CONTROL)
 				{
-					gear.open();
+					gear.open1();
 				}
 			}});
-		manualOpen.setReleaseAction(new ButtonAction(){
+		manual1Open.setReleaseAction(new ButtonAction(){
 
 			@Override
 			public void onAction() {
 				if(MANUAL_GEAR_CONTROL)
 				{
-					gear.stop();
+					gear.stop1();
 				}
 			}});
 		
 		
-		manualClose.setPressAction(new ButtonAction(){
+		manual1Close.setPressAction(new ButtonAction(){
 			@Override
 			public void onAction() {
 				if(MANUAL_GEAR_CONTROL)
 				{
-					gear.close();
+					gear.close1();
 				}
 			}});
-		manualClose.setReleaseAction(new ButtonAction(){
+		manual1Close.setReleaseAction(new ButtonAction(){
 
 			@Override
 			public void onAction() {
 				if(MANUAL_GEAR_CONTROL)
 				{
-					gear.stop();
+					gear.stop1();
+				}
+			}});
+		
+		manual2Open.setPressAction(new ButtonAction(){
+			@Override
+			public void onAction() {
+				if(MANUAL_GEAR_CONTROL)
+				{
+					gear.open2();
+				}
+			}});
+		manual2Open.setReleaseAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				if(MANUAL_GEAR_CONTROL)
+				{
+					gear.stop2();
+				}
+			}});
+		
+		
+		manual2Close.setPressAction(new ButtonAction(){
+			@Override
+			public void onAction() {
+				if(MANUAL_GEAR_CONTROL)
+				{
+					gear.close2();
+				}
+			}});
+		manual2Close.setReleaseAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				if(MANUAL_GEAR_CONTROL)
+				{
+					gear.stop2();
 				}
 			}});
 		
@@ -165,7 +206,7 @@ public class Robot extends SprocketRobot {
 		
 		
 		
-		
+		/*
 		//Rope climber motors
 		ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
 		ropeMotor1.constrain(0.0, 1.0);
@@ -360,6 +401,27 @@ public class Robot extends SprocketRobot {
 				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect )
 						);
 		super.addAutoMode(gearRight);*/
+		
+		/*AutoMode gearLeft = new AutoMode("Gear left peg",
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
+				dropGear,
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
+				new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect)
+						);
+		super.addAutoMode(gearLeft);
+		
+		AutoMode gearRight = new AutoMode("Gear right peg",
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
+				dropGear,
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
+				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect )
+						);
+		super.addAutoMode(gearRight);*/
+		//TODO: CONSTANT AUTO MODES
 		
 		State resetGyro=new State(){
 
