@@ -370,12 +370,18 @@ public class Robot extends SprocketRobot {
 		
 		
 		
-		AutoMode autoDrive=new AutoMode("AutoDriveEncoders", new DriveEncoders(new Distance(50), 0.5, MAX_ENC_ACCEL, MAX_ENC_TICKS));
+		AutoMode autoDrive=new AutoMode("AutoDriveEncoders", new DriveEncoders(new DashboardInput("drive-enc", 50), new DashboardInput("drive-enc-speed", 0.5), MAX_ENC_ACCEL, MAX_ENC_TICKS));
 		super.addAutoMode(autoDrive);
 		AutoMode autoTime=new AutoMode("AutoDriveTime",new DriveTime(6, .5));
 		super.addAutoMode(autoTime);
 		AutoMode autoTurn=new AutoMode("AutoTurn90",new TurnGyro(new Degrees(90),gCorrect, true));
 		super.addAutoMode(autoTurn);
+		
+		AutoMode autoSmartDashboardTest=new AutoMode("AutoSmartDashboardTest (sdtest)",
+				new DriveEncoders(new DashboardInput("sdtest-drive1-dist", 50), new DashboardInput("sdtest-drive1-power", 0.5), MAX_ENC_ACCEL, MAX_ENC_TICKS),
+				new Delay(new DashboardInput("sdtest-delay")),
+				new DriveEncoders(new DashboardInput("sdtest-drive2-dist", 50), new DashboardInput("sdtest-drive2-power", 0.5), MAX_ENC_ACCEL, MAX_ENC_TICKS));
+		super.addAutoMode(autoSmartDashboardTest);
 		
 		/*AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
 				new DriveEncoderGyro(new Distance(110-36-22), 0.35, maxEncAccel, maxEncTicksPerSec, gCorrect),
