@@ -453,6 +453,14 @@ public class Robot extends SprocketRobot {
 				
 			}};
 		
+			AutoMode gearLeft = new AutoMode("Gear left peg",
+					new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+					new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
+					new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+					new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
+					new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)
+							);
+			super.addAutoMode(gearLeft);
 		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(-96+6.3), 0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS),new Disable(gLock));
 		super.addAutoMode(autoDriveEncLock);
 		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(new DashboardInput("auto-time", 10.0), .5),new Disable(gLock));
