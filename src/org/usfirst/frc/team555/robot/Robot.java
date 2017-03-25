@@ -58,6 +58,8 @@ public class Robot extends SprocketRobot {
 	
 
 	private static final Distance ENC_SPEED = new Distance(1);
+	private static final double MAX_ENC_ACCEL = 0.0;
+	private static final double MAX_ENC_TICKS = 0.0;
 	
 	private Joystick driveStick;
 	private Joystick auxStick;
@@ -327,7 +329,7 @@ public class Robot extends SprocketRobot {
 		
 		
 		
-		AutoMode autoDrive=new AutoMode("AutoDriveEncoders", new DriveEncoders(new Distance(50), 0.5,ENC_SPEED));
+		AutoMode autoDrive=new AutoMode("AutoDriveEncoders", new DriveEncoders(new Distance(50), 0.5, MAX_ENC_ACCEL, MAX_ENC_TICKS));
 		super.addAutoMode(autoDrive);
 		AutoMode autoTime=new AutoMode("AutoDriveTime",new DriveTime(6, .5));
 		super.addAutoMode(autoTime);
@@ -335,27 +337,27 @@ public class Robot extends SprocketRobot {
 		super.addAutoMode(autoTurn);
 		
 		/*AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
-				new DriveEncoderGyro(new Distance(110-36-22), 0.35, ENC_SPEED, gCorrect),
+				new DriveEncoderGyro(new Distance(110-36-22), 0.35, maxEncAccel, maxEncTicksPerSec, gCorrect),
 				dropGear);
 		super.addAutoMode(gearStraight);*/
 		
 		/*AutoMode gearLeft = new AutoMode("Gear left peg",
-				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), ENC_SPEED, gCorrect),
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), maxEncAccel, maxEncTicksPerSec, gCorrect),
 				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
 				dropGear,
-				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), ENC_SPEED, gCorrect),
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
 				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
-				new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), ENC_SPEED, gCorrect)
+				new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect)
 						);
 		super.addAutoMode(gearLeft);
 		
 		AutoMode gearRight = new AutoMode("Gear right peg",
-				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), ENC_SPEED, gCorrect),
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
 				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
 				dropGear,
-				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), ENC_SPEED, gCorrect),
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
 				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
-				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35))
+				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect)
 						);
 		super.addAutoMode(gearRight);*/
 		
@@ -383,7 +385,7 @@ public class Robot extends SprocketRobot {
 				
 			}};
 		
-		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(-96+6.3), 0.5,ENC_SPEED),new Disable(gLock));
+		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(-96+6.3), 0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS),new Disable(gLock));
 		super.addAutoMode(autoDriveEncLock);
 		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(new DashboardInput("auto-time", 10.0), .5),new Disable(gLock));
 		super.addAutoMode(autoTimeLock);
@@ -393,16 +395,16 @@ public class Robot extends SprocketRobot {
 		super.addAutoMode(autoTurnTest45);
 		
 		AutoMode testRoutine=new AutoMode("Auto Test Routine",
-				new Enable(gLock),new DriveEncoders(new Distance(5*-12+6.3),0.5,ENC_SPEED),new Disable(gLock),
+				new Enable(gLock),new DriveEncoders(new Distance(5*-12+6.3),0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS),new Disable(gLock),
 				new TurnGyro(new Degrees(45),gCorrect,true),
-				new Enable(gLock),new DriveEncoders(new Distance(2*-12+6.3),0.5,ENC_SPEED),new Disable(gLock));
+				new Enable(gLock),new DriveEncoders(new Distance(2*-12+6.3),0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS),new Disable(gLock));
 		super.addAutoMode(testRoutine);
 		
 		AutoMode testEncodersGyro=new AutoMode("TestEncodersGyro",resetGyro,
-				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.ZERO,false,0.5,ENC_SPEED,gCorrect),
-				new DriveEncoderGyro(new Distance(2*-12+6.3),Angle.QUARTER,false,0.5,ENC_SPEED,gCorrect),
-				new DriveEncoderGyro(new Distance(2*-12+6.3),new Degrees(45),true,0.5,ENC_SPEED,gCorrect),
-				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.ZERO,false,0.5,ENC_SPEED,gCorrect));
+				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.ZERO,false,0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS,gCorrect),
+				new DriveEncoderGyro(new Distance(2*-12+6.3),Angle.QUARTER,false,0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS,gCorrect),
+				new DriveEncoderGyro(new Distance(2*-12+6.3),new Degrees(45),true,0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS,gCorrect),
+				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.ZERO,false,0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS,gCorrect));
 		super.addAutoMode(testEncodersGyro);
 		
 		super.sendAutoModes();
