@@ -50,12 +50,18 @@ public class Robot extends SprocketRobot {
 		AuxStickID=1,
 		CloseSwitchID=0,
 		OpenSwitchID=1,
+		CloseSwitch2ID=6,
+		OpenSwitch2ID=7,
 		GearButtonID=1,
 		FieldCentricButtonID=3,
-		GyroLockButtonID=11,
-		VisionButtonID=4,
-		LeftButtonID=5,
-		RightButtonID=6;
+		GyroLockButtonID=7,
+		//VisionButtonID=4,
+		LeftButtonID=4,
+		RightButtonID=5,
+		ManualOpen1=9,
+		ManualClose1=11,
+		ManualOpen2=12,
+		ManualClose2=10;
 	
 
 	private static final Distance ENC_SPEED = new Distance(1);
@@ -84,10 +90,11 @@ public class Robot extends SprocketRobot {
 		//Joysticks
 		driveStick = new Joystick(DriveStickID);
 		auxStick = new Joystick(AuxStickID);
-		
 		//Gear opened/closed limit switches
-		//openSwitch = new DigitalInput(OpenSwitchID);
-		//closeSwitch = new DigitalInput(CloseSwitchID);
+		//open1Switch = new DigitalInput(OpenSwitchID);
+		//close1Switch = new DigitalInput(CloseSwitchID);
+		//open2Switch = new DigitalInput(OpenSwitch2ID);
+		//close2Switch = new DigitalInput(CloseSwitch2ID);
 		
 		//Setting up gear trigger
 		//gear1Motor = new Motor(new CANTalon(5));
@@ -112,9 +119,6 @@ public class Robot extends SprocketRobot {
 					gear.closeLimit();
 				}
 			}});
-		
-		//final ControlledMotor manualGear=new ControlledMotor(gearMotor.getMotor(), new JoystickButton(auxStick, 6), new JoystickButton(auxStick, 7));*/
-		
 		
 		/*Button manual1Open=new JoystickButton(auxStick,6);
 		Button manual1Close=new JoystickButton(auxStick,7);
