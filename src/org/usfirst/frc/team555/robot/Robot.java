@@ -493,7 +493,7 @@ public class Robot extends SprocketRobot {
 		//Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
 		//Debug.msg("Open switch", openSwitch.get() ? "true" : "false");
 		
-		Debug.num("encRight speed", -encRight.get());
+		Debug.num("encRight speed", encRight.get());
 		Debug.num("encLeft speed", encLeft.get());
 		Debug.num("encRight raw dist", encRight.getTicks());
 		Debug.num("encLeft raw dist", encLeft.getTicks());
