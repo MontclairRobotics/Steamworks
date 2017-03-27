@@ -42,7 +42,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends SprocketRobot {
 
-	public static int GEAR_MODE = 0;
+	public static int GEAR_MODE = 2;
 	
 	private static final int IMG_WIDTH = 320,IMG_HEIGHT = 240;
 	private static final int 
@@ -85,24 +85,26 @@ public class Robot extends SprocketRobot {
 
 	private NavXRollInput navX;
 	
+	private Gear gear;
+	
 	@Override
 	public void robotInit() {
 		//Joysticks
 		driveStick = new Joystick(DriveStickID);
 		auxStick = new Joystick(AuxStickID);
 		//Gear opened/closed limit switches
-		//open1Switch = new DigitalInput(OpenSwitchID);
-		//close1Switch = new DigitalInput(CloseSwitchID);
-		//open2Switch = new DigitalInput(OpenSwitch2ID);
-		//close2Switch = new DigitalInput(CloseSwitch2ID);
+		open1Switch = new DigitalInput(OpenSwitchID);
+		close1Switch = new DigitalInput(CloseSwitchID);
+		open2Switch = new DigitalInput(OpenSwitch2ID);
+		close2Switch = new DigitalInput(CloseSwitch2ID);
 		
 		//Setting up gear trigger
-		//gear1Motor = new Motor(new CANTalon(5));
-		//gear2Motor = new Motor(new CANTalon(6));
-		//Gear gear = new Gear(gear1Motor,open1Switch,close1Switch, gear2Motor, open2Switch, close2Switch);
+		gear1Motor = new Motor(new CANTalon(8));
+		gear2Motor = new Motor(new CANTalon(9));
+		gear = new Gear(gear1Motor,open1Switch,close1Switch, gear2Motor, open2Switch, close2Switch);
 		
 
-		/*Button gearButton = new JoystickButton(driveStick, GearButtonID);
+		Button gearButton = new JoystickButton(driveStick, GearButtonID);
 		gearButton.setHeldAction(new ButtonAction(){
 			@Override
 			public void onAction() {
@@ -120,11 +122,11 @@ public class Robot extends SprocketRobot {
 				}
 			}});
 		
-		/*Button manual1Open=new JoystickButton(auxStick,6);
-		Button manual1Close=new JoystickButton(auxStick,7);
+		Button manual1Open=new JoystickButton(auxStick,ManualOpen1);
+		Button manual1Close=new JoystickButton(auxStick,ManualClose1);
 		
-		Button manual2Open = new JoystickButton(auxStick, 10);
-		Button manual2Close = new JoystickButton(auxStick, 11);
+		Button manual2Open = new JoystickButton(auxStick, ManualOpen2);
+		Button manual2Close = new JoystickButton(auxStick, ManualClose2);
 		
 		manual1Open.setPressAction(new ButtonAction(){
 			@Override
@@ -506,13 +508,13 @@ public class Robot extends SprocketRobot {
 		Debug.msg("gyroAngle", navX.get());
 		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
 		
-		/*if(GEAR_MODE == 1 && super.isOperatorControl() && auxStick != null && gear != null) {
-			if(auxStick.getThrottle() > 0.5) {
+		if(GEAR_MODE == 1 && super.isOperatorControl() && auxStick != null && gear != null) {
+			if(auxStick.getThrottle() < 0.5) {
 				gear.openLimit();
 			} else {
 				gear.closeLimit();
 			}
-		}*/
+		}
 	}
 }
 

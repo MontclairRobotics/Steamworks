@@ -19,13 +19,13 @@ private Gear g;
 	@Override
 	public void userStart()
 	{
-		Robot.MANUAL_GEAR_CONTROL=true;
+		Robot.GEAR_MODE=2;
 		g.close();
 	}
 	@Override
 	public void userStop() {
 		g.stop();
-		Robot.MANUAL_GEAR_CONTROL=false;
+		Robot.GEAR_MODE=2;
 	}
 
 	@Override

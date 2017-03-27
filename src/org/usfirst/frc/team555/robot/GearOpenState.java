@@ -19,7 +19,7 @@ public class GearOpenState extends AutoState {
 	@Override
 	public void userStart()
 	{
-		Robot.MANUAL_GEAR_CONTROL=true;
+		Robot.GEAR_MODE=2;
 		g.open();
 	}
 	@Override
