@@ -86,6 +86,7 @@ public class Robot extends SprocketRobot {
 	private NavXRollInput navX;
 	
 	private Gear gear;
+	private DashboardInput gearSpeedInput;
 	
 	@Override
 	public void robotInit() {
@@ -102,6 +103,7 @@ public class Robot extends SprocketRobot {
 		gear1Motor = new Motor(new CANTalon(8));
 		gear2Motor = new Motor(new CANTalon(9));
 		gear = new Gear(gear1Motor,open1Switch,close1Switch, gear2Motor, open2Switch, close2Switch);
+		gearSpeedInput = new DashboardInput("gear speed", 0.1);
 		
 
 		Button gearButton = new JoystickButton(driveStick, GearButtonID);
@@ -515,6 +517,8 @@ public class Robot extends SprocketRobot {
 				gear.closeLimit();
 			}
 		}
+		
+		gear.gearSpeed = gearSpeedInput.get();
 	}
 }
 
