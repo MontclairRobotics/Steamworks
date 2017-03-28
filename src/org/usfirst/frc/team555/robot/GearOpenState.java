@@ -2,6 +2,7 @@ package org.usfirst.frc.team555.robot;
 
 import org.montclairrobotics.sprocket.auto.AutoState;
 import org.montclairrobotics.sprocket.motors.Motor;
+import org.usfirst.frc.team555.robot.Robot.GEAR_MODE;
 
 public class GearOpenState extends AutoState {
 	
@@ -19,7 +20,7 @@ public class GearOpenState extends AutoState {
 	@Override
 	public void userStart()
 	{
-		Robot.GEAR_MODE=2;
+		Robot.gearMode=GEAR_MODE.MANUAL;
 		g.open();
 	}
 	@Override

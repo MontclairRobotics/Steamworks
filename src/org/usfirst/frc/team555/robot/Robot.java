@@ -49,13 +49,14 @@ public class Robot extends SprocketRobot {
 	private static final int 
 		DriveStickID=0,
 		AuxStickID=1,
-		CloseSwitchID=0,
+		CloseSwitchID=0,//limit switches
 		OpenSwitchID=1,
 		CloseSwitch2ID=6,
 		OpenSwitch2ID=7,
 		GearButtonID=1,
-		FieldCentricButtonID=3,
+		FieldCentricButtonID=2,
 		GyroLockButtonID=7,
+		ResetGyroID=3,
 		//VisionButtonID=4,
 		LeftButtonID=4,
 		RightButtonID=5,
@@ -88,6 +89,7 @@ public class Robot extends SprocketRobot {
 	
 	private Gear gear;
 	private DashboardInput gearSpeedInput;
+
 	
 	@Override
 	public void robotInit() {
@@ -285,9 +287,20 @@ public class Robot extends SprocketRobot {
 		new ToggleButton(driveStick, GyroLockButtonID, gLock);
 
 		
-		//FieldCentricDriveInput fieldCentric=new FieldCentricDriveInput(driveStick,gLock);
+		//FIELD CENTRIC DRIVE!!!!
+		FieldCentricDriveInput fieldCentric=new FieldCentricDriveInput(driveStick,gCorrect);
+		new ToggleButton(driveStick,FieldCentricButtonID,fieldCentric);
+		//END FIELD CENTRIC. :(
 		
-		//new ToggleButton(driveStick,FieldCentricButtonID,fieldCentric);
+		
+		Button resetGyroButton=new JoystickButton(driveStick,ResetGyroID);
+		resetGyroButton.setPressAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				gCorrect.reset();
+			}});
+		
 		
 		//Vision
 		//UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
@@ -346,6 +359,7 @@ public class Robot extends SprocketRobot {
 		//builder.addStep(accelLimit);
 		//builder.addStep(visionStep);
 		builder.addStep(gCorrect);
+		
 		
 		try {
 			builder.build();

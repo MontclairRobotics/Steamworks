@@ -2,6 +2,7 @@ package org.usfirst.frc.team555.robot;
 
 import org.montclairrobotics.sprocket.auto.AutoState;
 import org.montclairrobotics.sprocket.motors.Motor;
+import org.usfirst.frc.team555.robot.Robot.GEAR_MODE;
 
 public class GearCloseState extends AutoState {
 	
@@ -19,13 +20,13 @@ private Gear g;
 	@Override
 	public void userStart()
 	{
-		Robot.GEAR_MODE=2;
+		Robot.gearMode=GEAR_MODE.MANUAL;
 		g.close();
 	}
 	@Override
 	public void userStop() {
 		g.stop();
-		Robot.GEAR_MODE=2;
+		Robot.gearMode=GEAR_MODE.MANUAL;
 	}
 
 	@Override
