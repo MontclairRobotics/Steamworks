@@ -13,7 +13,7 @@ public class Gear {
 	private DigitalInput close1Switch;
 	private DigitalInput close2Switch;
 	
-	public static double gearSpeed = 0.2;
+	public double gearSpeed = 0.2;
 	
 
 	public Gear(Motor m1,DigitalInput openSwitch,DigitalInput closeSwitch,Motor m2,DigitalInput open2Switch,DigitalInput close2Switch)
