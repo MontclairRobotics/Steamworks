@@ -240,7 +240,7 @@ public class Robot extends SprocketRobot {
 		
 		Deadzone deadzone=new Deadzone();
 		
-		AccelLimit accelLimit=new AccelLimit(1.2*4,0.4*4*Math.PI/180*4);
+		AccelLimit accelLimit=new AccelLimit(4,4);
 		
 		/*
 		//Full speed button
@@ -360,6 +360,7 @@ public class Robot extends SprocketRobot {
 		//builder.addStep(visionStep);
 		builder.addStep(gCorrect);
 		
+		builder.addStep(accelLimit);
 		
 		try {
 			builder.build();
