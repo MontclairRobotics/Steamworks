@@ -42,7 +42,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends SprocketRobot {
 
-	public static int GEAR_MODE = 2;
+	public static enum GEAR_MODE {MANUAL,AUTO};
+	public static GEAR_MODE gearMode=GEAR_MODE.AUTO;
 	
 	private static final int IMG_WIDTH = 320,IMG_HEIGHT = 240;
 	private static final int 
@@ -110,7 +111,7 @@ public class Robot extends SprocketRobot {
 		gearButton.setHeldAction(new ButtonAction(){
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 0)
+				if(gearMode == GEAR_MODE.AUTO)
 				{
 					gear.openLimit();
 				}
@@ -118,7 +119,7 @@ public class Robot extends SprocketRobot {
 		gearButton.setOffAction(new ButtonAction(){
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 0)
+				if(gearMode == GEAR_MODE.AUTO)
 				{
 					gear.closeLimit();
 				}
@@ -133,7 +134,7 @@ public class Robot extends SprocketRobot {
 		manual1Open.setPressAction(new ButtonAction(){
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 2)
+				if(gearMode == GEAR_MODE.MANUAL)
 				{
 					gear.open1();
 				}
@@ -142,7 +143,7 @@ public class Robot extends SprocketRobot {
 
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 2)
+				if(gearMode == GEAR_MODE.MANUAL)
 				{
 					gear.stop1();
 				}
@@ -152,7 +153,7 @@ public class Robot extends SprocketRobot {
 		manual1Close.setPressAction(new ButtonAction(){
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 2)
+				if(gearMode == GEAR_MODE.MANUAL)
 				{
 					gear.close1();
 				}
@@ -161,7 +162,7 @@ public class Robot extends SprocketRobot {
 
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 2)
+				if(gearMode == GEAR_MODE.MANUAL)
 				{
 					gear.stop1();
 				}
@@ -170,7 +171,7 @@ public class Robot extends SprocketRobot {
 		manual2Open.setPressAction(new ButtonAction(){
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 2)
+				if(gearMode == GEAR_MODE.MANUAL)
 				{
 					gear.open2();
 				}
@@ -179,7 +180,7 @@ public class Robot extends SprocketRobot {
 
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 2)
+				if(gearMode == GEAR_MODE.MANUAL)
 				{
 					gear.stop2();
 				}
@@ -189,7 +190,7 @@ public class Robot extends SprocketRobot {
 		manual2Close.setPressAction(new ButtonAction(){
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 2)
+				if(gearMode == GEAR_MODE.MANUAL)
 				{
 					gear.close2();
 				}
@@ -198,7 +199,7 @@ public class Robot extends SprocketRobot {
 
 			@Override
 			public void onAction() {
-				if(GEAR_MODE == 2)
+				if(gearMode == GEAR_MODE.MANUAL)
 				{
 					gear.stop2();
 				}
@@ -208,7 +209,14 @@ public class Robot extends SprocketRobot {
 		manualGearToggle.setPressAction(new ButtonAction() {
 			@Override
 			public void onAction() {
-				GEAR_MODE = (GEAR_MODE + 1) % 3;
+				if(gearMode==GEAR_MODE.AUTO)
+				{
+					gearMode=GEAR_MODE.MANUAL;
+				}
+				else
+				{
+					gearMode=GEAR_MODE.AUTO;
+				}
 			}
 		});
 		
@@ -351,7 +359,7 @@ public class Robot extends SprocketRobot {
 			@Override
 			public void onAction() {
 				gLock.disable();
-				GEAR_MODE=0;
+				gearMode=GEAR_MODE.MANUAL;
 			}});
 		
 		/*StateMachine dropGear=new StateMachine(
@@ -497,7 +505,6 @@ public class Robot extends SprocketRobot {
 	
 	public void update()
 	{
-		Debug.msg("Gear control mode", GEAR_MODE);
 		//Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
 		//Debug.msg("Open switch", openSwitch.get() ? "true" : "false");
 		
@@ -510,13 +517,14 @@ public class Robot extends SprocketRobot {
 		Debug.msg("gyroAngle", navX.get());
 		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
 		
-		if(GEAR_MODE == 1 && super.isOperatorControl() && auxStick != null && gear != null) {
+		//if(GEAR_MODE == 1 && super.isOperatorControl() && auxStick != null && gear != null) {
 			if(auxStick.getThrottle() < 0.5) {
-				gear.openLimit();
+				gearMode=GEAR_MODE.AUTO;
 			} else {
-				gear.closeLimit();
+				gearMode=GEAR_MODE.MANUAL;
 			}
-		}
+		//}
+		Debug.msg("Gear control mode", gearMode);
 		
 		gear.gearSpeed = gearSpeedInput.get();
 	}
