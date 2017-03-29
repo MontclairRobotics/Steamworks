@@ -24,7 +24,11 @@ import org.montclairrobotics.sprocket.states.State;
 import org.montclairrobotics.sprocket.states.StateMachine;
 import org.montclairrobotics.sprocket.motors.Module.MotorInputType;
 import org.montclairrobotics.sprocket.utils.Debug;
+import org.montclairrobotics.sprocket.utils.DoubleInput;
+import org.montclairrobotics.sprocket.utils.Input;
 import org.montclairrobotics.sprocket.utils.PID;
+import org.montclairrobotics.sprocket.utils.ZeroInput;
+
 import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.CameraServer;
@@ -431,28 +435,65 @@ public class Robot extends SprocketRobot {
 			SIDE_DRIVE_B=10,//from the turn to the peg
 			SIDE_DRIVE_C=100;//after backing up, across the baseline
 		
+		double FULL_SPEED=0.8;
 		
 		
 		super.addAutoMode(new AutoMode("Gear STRAIGHT Then Nothing Else", 
 				resetGyro,
-				new DriveEncoderGyro(new Distance(STRAIGHT_DRIVE_A), Angle.ZERO, false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(STRAIGHT_DRIVE_A), Angle.ZERO, false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				dropGear));
 		
 		super.addAutoMode(new AutoMode("Gear LEFT Peg (Turn RIGHT)",
 				resetGyro,
-				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A),Angle.ZERO,false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
-				new DriveEncoderGyro(new Distance(SIDE_DRIVE_B),new Degrees(60),false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A),Angle.ZERO,false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_B),new Degrees(60),false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				dropGear,
-				new DriveEncoderGyro(new Distance(-SIDE_DRIVE_B),new Degrees(60),false, -0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
-				new DriveEncoderGyro(new Distance(SIDE_DRIVE_C),Angle.ZERO,false, 0.35, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
+				new DriveEncoderGyro(new Distance(-SIDE_DRIVE_B),new Degrees(60),false, -FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_C),Angle.ZERO,false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
 		
 		super.addAutoMode(new AutoMode("Gear RIGHT Peg (Turn LEFT)",
 				resetGyro,
-				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A),Angle.ZERO,false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
-				new DriveEncoderGyro(new Distance(SIDE_DRIVE_B),new Degrees(-60),false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A),Angle.ZERO,false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_B),new Degrees(-60),false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				dropGear,
-				new DriveEncoderGyro(new Distance(-SIDE_DRIVE_B),new Degrees(-60),false, -0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
-				new DriveEncoderGyro(new Distance(SIDE_DRIVE_C),Angle.ZERO,false, 0.35, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
+				new DriveEncoderGyro(new Distance(-SIDE_DRIVE_B),new Degrees(-60),false, -FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_C),Angle.ZERO,false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
+		
+
+		//==================== EDITABLE TEST AUTO MODES ====================
+		DashboardInput
+			STRAIGHT_DRIVE_A_INPUT=new DashboardInput("STRAIGHT_DRIVE_A",STRAIGHT_DRIVE_A),//up to the peg
+			SIDE_DRIVE_A_INPUT=new DashboardInput("SIDE_DRIVE_A",SIDE_DRIVE_A),//first drive to the turn
+			SIDE_DRIVE_B_INPUT=new DashboardInput("SIDE_DRIVE_B",SIDE_DRIVE_B),//from the turn to the peg
+			SIDE_DRIVE_C_INPUT=new DashboardInput("SIDE_DRIVE_B",SIDE_DRIVE_B);//after backing up, across the baseline
+		
+		DashboardInput FULL_SPEED_INPUT=new DashboardInput("FULL_SPEED",FULL_SPEED);
+		
+		Input<Double> zeroInput=new ZeroInput();
+		Input<Double> input60=new DoubleInput(60);
+		Input<Double> inputNeg60=new DoubleInput(-60);
+		
+		super.addAutoMode(new AutoMode("EDITABLE Gear STRAIGHT Then Nothing Else", 
+				resetGyro,
+				new DriveEncoderGyro(STRAIGHT_DRIVE_A_INPUT, zeroInput, false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				dropGear));
+		
+		super.addAutoMode(new AutoMode("EDITABLE Gear LEFT Peg (Turn RIGHT)",
+				resetGyro,
+				new DriveEncoderGyro(SIDE_DRIVE_A_INPUT,zeroInput,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(SIDE_DRIVE_B_INPUT,input60,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				dropGear,
+				new DriveEncoderGyro(Input.neg(SIDE_DRIVE_B_INPUT),input60,false, Input.neg(FULL_SPEED_INPUT), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(SIDE_DRIVE_C_INPUT,zeroInput,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
+		
+		super.addAutoMode(new AutoMode("EDITABLE Gear RIGHT Peg (Turn LEFT)",
+				resetGyro,
+				new DriveEncoderGyro(SIDE_DRIVE_A_INPUT,zeroInput,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(SIDE_DRIVE_B_INPUT,inputNeg60,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				dropGear,
+				new DriveEncoderGyro(Input.neg(SIDE_DRIVE_B_INPUT),inputNeg60,false, Input.neg(FULL_SPEED_INPUT), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(SIDE_DRIVE_C_INPUT,zeroInput,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
+				
 		
 		/*AutoMode gearLeft = new AutoMode("Gear left peg",
 				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), maxEncAccel, maxEncTicksPerSec, gCorrect),
