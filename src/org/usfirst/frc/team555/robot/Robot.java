@@ -377,93 +377,21 @@ public class Robot extends SprocketRobot {
 				gearMode=GEAR_MODE.MANUAL;
 			}});
 		
-		/*StateMachine dropGear=new StateMachine(
-				new DriveEncoders(new Distance(22),0.2,ENC_SPEED),
-				new DriveTime(0.8,0.1),
+		//==================== AUTO SUBROUTINES ====================
+		
+		StateMachine dropGear=new StateMachine(
+				new DriveEncoders(12, 0.3, MAX_ENC_ACCEL, MAX_ENC_TICKS),
+				new WiggleLeft(),
+				new WiggleRight(),
+				new DriveTime(0.25,0.2),
 				new GearOpenState(gear),
-				new Delay(0.2),
-				new DriveEncoders(new Distance(-22),-0.3,ENC_SPEED)
-				/*new State(){
-					@Override
-					public boolean isDone() {
-						return true;
-					}
-					@Override
-					public void start() {
-						GEAR_MODE=2;
-					}
-					@Override
-					public void stateUpdate() {
-					}
-					@Override
-					public void stop() {
-					}});*/
-		
-		
-		
-		AutoMode autoDrive=new AutoMode("AutoDriveEncoders", new DriveEncoders(new DashboardInput("drive-enc", 50), new DashboardInput("drive-enc-speed", 0.5), MAX_ENC_ACCEL, MAX_ENC_TICKS));
-		super.addAutoMode(autoDrive);
-		AutoMode autoTime=new AutoMode("AutoDriveTime",new DriveTime(6, .5));
-		super.addAutoMode(autoTime);
-		AutoMode autoTurn=new AutoMode("AutoTurn90",new TurnGyro(new Degrees(90),gCorrect, true));
-		super.addAutoMode(autoTurn);
-		
-		AutoMode autoSmartDashboardTest=new AutoMode("AutoSmartDashboardTest (sdtest)",
-				new DriveEncoders(new DashboardInput("sdtest-drive1-dist", 50), new DashboardInput("sdtest-drive1-power", 0.5), MAX_ENC_ACCEL, MAX_ENC_TICKS),
-				new Delay(new DashboardInput("sdtest-delay")),
-				new DriveEncoders(new DashboardInput("sdtest-drive2-dist", 50), new DashboardInput("sdtest-drive2-power", 0.5), MAX_ENC_ACCEL, MAX_ENC_TICKS));
-		super.addAutoMode(autoSmartDashboardTest);
-		
-		/*AutoMode gearStraight = new AutoMode("Gear Straight Then Nothing Else", 
-				new DriveEncoderGyro(new Distance(110-36-22), 0.35, maxEncAccel, maxEncTicksPerSec, gCorrect),
-				dropGear);
-		super.addAutoMode(gearStraight);*/
-		
-		/*AutoMode gearLeft = new AutoMode("Gear left peg",
-				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), maxEncAccel, maxEncTicksPerSec, gCorrect),
-				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
-				dropGear,
-				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
-				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
-				new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect)
-						);
-		super.addAutoMode(gearLeft);
-		
-		AutoMode gearRight = new AutoMode("Gear right peg",
-				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
-				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
-				dropGear,
-				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
-				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
-				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect )
-						);
-		super.addAutoMode(gearRight);*/
-		
-		/*AutoMode gearLeft = new AutoMode("Gear left peg",
-				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), maxEncAccel, maxEncTicksPerSec, gCorrect),
-				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
-				dropGear,
-				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
-				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
-				new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect)
-						);
-		super.addAutoMode(gearLeft);
-		
-		AutoMode gearRight = new AutoMode("Gear right peg",
-				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
-				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
-				dropGear,
-				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
-				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
-				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect )
-						);
-		super.addAutoMode(gearRight);*/
-		//TODO: CONSTANT AUTO MODES
-		
-		State resetGyro=new State(){
+				new DriveEncoders(-12, -0.3, MAX_ENC_ACCEL, MAX_ENC_TICKS));
+
+		State resetGyro= new State(){
 
 			@Override
 			public boolean isDone() {
+				// TODO Auto-generated method stub
 				return true;
 			}
 
@@ -484,35 +412,87 @@ public class Robot extends SprocketRobot {
 				
 			}};
 		
-			AutoMode gearLeft = new AutoMode("Gear left peg",
-					new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
-					new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
-					new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
-					new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
-					new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)
-							);
-			super.addAutoMode(gearLeft);
-		AutoMode autoDriveEncLock=new AutoMode("AutoDriveEncoders with gyrolock", new Enable(gLock),new DriveEncoders(new Distance(-96+6.3), 0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS),new Disable(gLock));
-		super.addAutoMode(autoDriveEncLock);
-		AutoMode autoTimeLock=new AutoMode("AutoDriveTime with gyrolock",new Enable(gLock),new DriveTime(new DashboardInput("auto-time", 10.0), .5),new Disable(gLock));
-		super.addAutoMode(autoTimeLock);
-		AutoMode autoTurnTest90=new AutoMode("Auto Turn 90 With Bugfix",resetGyro,new TurnGyro(Angle.QUARTER,gCorrect,false));
-		super.addAutoMode(autoTurnTest90);
-		AutoMode autoTurnTest45=new AutoMode("Auto Turn 45",resetGyro,new TurnGyro(new Degrees(45),gCorrect,false));
-		super.addAutoMode(autoTurnTest45);
 		
-		AutoMode testRoutine=new AutoMode("Auto Test Routine",
-				new Enable(gLock),new DriveEncoders(new Distance(5*-12+6.3),0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS),new Disable(gLock),
-				new TurnGyro(new Degrees(45),gCorrect,true),
-				new Enable(gLock),new DriveEncoders(new Distance(2*-12+6.3),0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS),new Disable(gLock));
-		super.addAutoMode(testRoutine);
+		//==================== TEST AUTO MODES ====================
+		AutoMode autoDrive=new AutoMode("AutoDriveEncoders", new DriveEncoders(new DashboardInput("drive-enc", 50), new DashboardInput("drive-enc-speed", 0.5), MAX_ENC_ACCEL, MAX_ENC_TICKS));
+		super.addAutoMode(autoDrive);
 		
-		AutoMode testEncodersGyro=new AutoMode("TestEncodersGyro",resetGyro,
-				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.ZERO,false,0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS,gCorrect),
-				new DriveEncoderGyro(new Distance(2*-12+6.3),Angle.QUARTER,false,0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS,gCorrect),
-				new DriveEncoderGyro(new Distance(2*-12+6.3),new Degrees(45),true,0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS,gCorrect),
-				new DriveEncoderGyro(new Distance(5*-12+6.3),Angle.ZERO,false,0.5,MAX_ENC_ACCEL, MAX_ENC_TICKS,gCorrect));
-		super.addAutoMode(testEncodersGyro);
+		AutoMode autoSmartDashboardTest=new AutoMode("AutoSmartDashboardTest (sdtest)",
+				new DriveEncoders(new DashboardInput("sdtest-drive1-dist", 50), new DashboardInput("sdtest-drive1-power", 0.5), MAX_ENC_ACCEL, MAX_ENC_TICKS),
+				new Delay(new DashboardInput("sdtest-delay")),
+				new DriveEncoders(new DashboardInput("sdtest-drive2-dist", 50), new DashboardInput("sdtest-drive2-power", 0.5), MAX_ENC_ACCEL, MAX_ENC_TICKS));
+		super.addAutoMode(autoSmartDashboardTest);
+		
+		
+		//==================== REAL AUTO MODES ====================
+		double
+			STRAIGHT_DRIVE_A=110-36-12,//up to the peg
+			SIDE_DRIVE_A=100,//first drive to the turn
+			SIDE_DRIVE_B=10,//from the turn to the peg
+			SIDE_DRIVE_C=100;//after backing up, across the baseline
+		
+		
+		
+		super.addAutoMode(new AutoMode("Gear STRAIGHT Then Nothing Else", 
+				resetGyro,
+				new DriveEncoderGyro(new Distance(STRAIGHT_DRIVE_A), Angle.ZERO, false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				dropGear));
+		
+		super.addAutoMode(new AutoMode("Gear LEFT Peg (Turn RIGHT)",
+				resetGyro,
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A),Angle.ZERO,false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_B),new Degrees(60),false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				dropGear,
+				new DriveEncoderGyro(new Distance(-SIDE_DRIVE_B),new Degrees(60),false, -0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_C),Angle.ZERO,false, 0.35, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
+		
+		super.addAutoMode(new AutoMode("Gear RIGHT Peg (Turn LEFT)",
+				resetGyro,
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A),Angle.ZERO,false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_B),new Degrees(-60),false, 0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				dropGear,
+				new DriveEncoderGyro(new Distance(-SIDE_DRIVE_B),new Degrees(-60),false, -0.8, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_C),Angle.ZERO,false, 0.35, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
+		
+		/*AutoMode gearLeft = new AutoMode("Gear left peg",
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
+				dropGear,
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
+				new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect)
+						);
+		super.addAutoMode(gearLeft);
+		
+		AutoMode gearRight = new AutoMode("Gear right peg",
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
+				dropGear,
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
+				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect )
+						);
+		super.addAutoMode(gearRight);*/
+		
+		/*AutoMode gearLeft = new AutoMode("Gear left peg",
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
+				dropGear,
+				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("left-turn-1", 60), gCorrect, true),
+				new DriveEncoderGyro(new DashboardInput("left-leg-2", 60), new DashboardInput("left-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect)
+						);
+		super.addAutoMode(gearLeft);
+		
+		AutoMode gearRight = new AutoMode("Gear right peg",
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
+				dropGear,
+				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
+				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
+				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect )
+						);
+		super.addAutoMode(gearRight);*/
 		
 		super.sendAutoModes();
 		
