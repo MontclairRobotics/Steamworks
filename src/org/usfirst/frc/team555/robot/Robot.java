@@ -475,12 +475,12 @@ public class Robot extends SprocketRobot {
 		
 		super.addAutoMode(new AutoMode("EDITABLE Gear STRAIGHT Then Nothing Else", 
 				resetGyro,
-				new DriveEncoderGyro(STRAIGHT_DRIVE_A_INPUT, zeroInput, false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(STRAIGHT_DRIVE_A_INPUT, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				dropGear));
 		
 		super.addAutoMode(new AutoMode("EDITABLE Gear LEFT Peg (Turn RIGHT)",
 				resetGyro,
-				new DriveEncoderGyro(SIDE_DRIVE_A_INPUT,zeroInput,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(SIDE_DRIVE_A_INPUT, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				new DriveEncoderGyro(SIDE_DRIVE_B_INPUT,input60,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				dropGear,
 				new DriveEncoderGyro(Input.neg(SIDE_DRIVE_B_INPUT),input60,false, Input.neg(FULL_SPEED_INPUT), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
@@ -488,7 +488,7 @@ public class Robot extends SprocketRobot {
 		
 		super.addAutoMode(new AutoMode("EDITABLE Gear RIGHT Peg (Turn LEFT)",
 				resetGyro,
-				new DriveEncoderGyro(SIDE_DRIVE_A_INPUT,zeroInput,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(SIDE_DRIVE_A_INPUT, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				new DriveEncoderGyro(SIDE_DRIVE_B_INPUT,inputNeg60,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				dropGear,
 				new DriveEncoderGyro(Input.neg(SIDE_DRIVE_B_INPUT),inputNeg60,false, Input.neg(FULL_SPEED_INPUT), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
