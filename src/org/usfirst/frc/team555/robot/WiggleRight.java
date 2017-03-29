@@ -13,8 +13,8 @@ public class WiggleRight extends AutoState {
 
 	@Override
 	public void stateUpdate() {
-		tgtDir = new XY(0, .1);
-		tgtTurn = new Radians(.1);
+		tgtDir = new XY(0, .3);
+		tgtTurn = new Radians(.3);
 	}
 
 }

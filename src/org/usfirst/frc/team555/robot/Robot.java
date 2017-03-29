@@ -244,7 +244,7 @@ public class Robot extends SprocketRobot {
 		
 		Deadzone deadzone=new Deadzone();
 		
-		AccelLimit accelLimit=new AccelLimit(4,4);
+		AccelLimit accelLimit=new AccelLimit(4,16);
 		
 		/*
 		//Full speed button
@@ -384,12 +384,12 @@ public class Robot extends SprocketRobot {
 		//==================== AUTO SUBROUTINES ====================
 		
 		StateMachine dropGear=new StateMachine(
-				new DriveEncoders(12, 0.3, MAX_ENC_ACCEL, MAX_ENC_TICKS),
+				new DriveEncoders(22, 0.3, MAX_ENC_ACCEL, MAX_ENC_TICKS),
 				new WiggleLeft(),
 				new WiggleRight(),
 				new DriveTime(0.25,0.2),
 				new GearOpenState(gear),
-				new DriveEncoders(-12, -0.3, MAX_ENC_ACCEL, MAX_ENC_TICKS));
+				new DriveEncoders(-22, -0.3, MAX_ENC_ACCEL, MAX_ENC_TICKS));
 
 		State resetGyro= new State(){
 
@@ -430,7 +430,7 @@ public class Robot extends SprocketRobot {
 		
 		//==================== REAL AUTO MODES ====================
 		double
-			STRAIGHT_DRIVE_A=110-36-12,//up to the peg
+			STRAIGHT_DRIVE_A=110-36-22,//up to the peg
 			SIDE_DRIVE_A=100,//first drive to the turn
 			SIDE_DRIVE_B=10,//from the turn to the peg
 			SIDE_DRIVE_C=100;//after backing up, across the baseline
@@ -440,12 +440,12 @@ public class Robot extends SprocketRobot {
 		
 		super.addAutoMode(new AutoMode("Gear STRAIGHT Then Nothing Else", 
 				resetGyro,
-				new DriveEncoderGyro(new Distance(STRAIGHT_DRIVE_A), Angle.ZERO, false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(STRAIGHT_DRIVE_A), FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				dropGear));
 		
 		super.addAutoMode(new AutoMode("Gear LEFT Peg (Turn RIGHT)",
 				resetGyro,
-				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A),Angle.ZERO,false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A), FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				new DriveEncoderGyro(new Distance(SIDE_DRIVE_B),new Degrees(60),false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				dropGear,
 				new DriveEncoderGyro(new Distance(-SIDE_DRIVE_B),new Degrees(60),false, -FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
@@ -453,7 +453,7 @@ public class Robot extends SprocketRobot {
 		
 		super.addAutoMode(new AutoMode("Gear RIGHT Peg (Turn LEFT)",
 				resetGyro,
-				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A),Angle.ZERO,false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_A), FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				new DriveEncoderGyro(new Distance(SIDE_DRIVE_B),new Degrees(-60),false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				dropGear,
 				new DriveEncoderGyro(new Distance(-SIDE_DRIVE_B),new Degrees(-60),false, -FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
