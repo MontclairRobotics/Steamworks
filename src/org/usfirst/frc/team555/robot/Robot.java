@@ -365,8 +365,6 @@ public class Robot extends SprocketRobot {
 		//builder.addStep(visionStep);
 		builder.addStep(gCorrect);
 		
-		builder.addStep(accelLimit);
-		
 		try {
 			builder.build();
 		} catch (InvalidDriveTrainException e) {
