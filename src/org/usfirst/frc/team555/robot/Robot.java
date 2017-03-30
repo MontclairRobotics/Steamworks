@@ -436,6 +436,20 @@ public class Robot extends SprocketRobot {
 			SIDE_DRIVE_B=-(61.5-22),//from the turn to the peg
 			SIDE_DRIVE_C=-100;//after backing up, across the baseline
 		
+		
+		/*
+		 * Left peg
+		 * 88-25
+		 * 52 degrees
+		 * 61.5-22 forward
+		 * 
+		 * 
+		 * Right peg
+		 * 86 inch
+		 * 53 degrees
+		 * 4 inches
+		 */
+		
 		double FULL_SPEED=-0.8;
 		
 		
