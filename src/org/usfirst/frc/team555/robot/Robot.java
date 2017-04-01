@@ -54,10 +54,10 @@ public class Robot extends SprocketRobot {
 	private static final int 
 		DriveStickID=0,
 		AuxStickID=1,
-		CloseSwitchID=0,//limit switches
-		OpenSwitchID=1,
-		CloseSwitch2ID=7,
-		OpenSwitch2ID=6,
+		CloseSwitchLeftID=0,//limit switches
+		OpenSwitchLeftID=1,
+		CloseSwitchRightID=7,
+		OpenSwitchRightID=6,
 		GearButtonID=1,
 		FieldCentricButtonID=2,
 		GyroLockButtonID=7,
@@ -67,13 +67,15 @@ public class Robot extends SprocketRobot {
 		RightButtonID=5,
 		ManualOpen1=9,
 		ManualClose1=11,
-		ManualOpen2=12,
-		ManualClose2=10;
+		ManualOpen2=10,
+		ManualClose2=12;
 	
 
 	private static final Distance ENC_SPEED = new Distance(1);
 	private static final double MAX_ENC_ACCEL = 13;
 	private static final double MAX_ENC_TICKS = 25;
+	
+	private static boolean lastAutoGear=true;
 	
 	private Joystick driveStick;
 	private Joystick auxStick;
@@ -102,19 +104,21 @@ public class Robot extends SprocketRobot {
 		driveStick = new Joystick(DriveStickID);
 		auxStick = new Joystick(AuxStickID);
 		//Gear opened/closed limit switches
-		openLeftSwitch = new DigitalInput(OpenSwitchID);
-		closeLeftSwitch = new DigitalInput(CloseSwitchID);
-		openRightSwitch = new DigitalInput(OpenSwitch2ID);
-		closeRightSwitch = new DigitalInput(CloseSwitch2ID);
+		openLeftSwitch = new DigitalInput(OpenSwitchLeftID);
+		closeLeftSwitch = new DigitalInput(CloseSwitchLeftID);
+		openRightSwitch = new DigitalInput(OpenSwitchRightID);
+		closeRightSwitch = new DigitalInput(CloseSwitchRightID);
 		
 		//Setting up gear trigger
-		gearLeftMotor = new Motor(new CANTalon(5));
-		gearRightMotor = new Motor(new VictorSP(0));
+		gearLeftMotor = new Motor(new VictorSP(0));
+		gearLeftMotor.setInverted(true);
+		gearRightMotor = new Motor(new CANTalon(5));
+		gearRightMotor.setInverted(true);
 		gear = new Gear(gearLeftMotor,openLeftSwitch,closeLeftSwitch, gearRightMotor, openRightSwitch, closeRightSwitch);
-		gearSpeedInput = new DashboardInput("gear speed", 0.1);
+		gearSpeedInput = new DashboardInput("gear speed", 0.5);
 		
-
-		Button gearButton = new JoystickButton(driveStick, GearButtonID);
+		//DRIVE STICK TO AUX STICK CHANGE
+		Button gearButton = new JoystickButton(auxStick, GearButtonID);
 		gearButton.setHeldAction(new ButtonAction(){
 			@Override
 			public void onAction() {
@@ -344,12 +348,12 @@ public class Robot extends SprocketRobot {
 		builder = new DriveTrainBuilder();
 		builder.setDriveTrainType(DriveTrainType.TANK);
 		
-		PID motorPID = new PID(0.5, 0.05, 0);
-		//PID motorPID = new PID(0, 0, 0);
+		//PID motorPID = new PID(0.5, 0.05, 0);
+		PID motorPID = new PID(0, 0, 0);
 		encRight = new SEncoder(2, 3, /*5865/76.25/*952.0/(6.0*Math.PI)*/18208/239.4, true);
-		encLeft = new SEncoder(8, 9, /*5865/76.25/*952.0/(6.0*Math.PI)*/18208/239.4, true);
+		encLeft = new SEncoder(4, 5, /*5865/76.25/*952.0/(6.0*Math.PI)*/18208/239.4, true);
 		
-		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
+		builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO, encLeft, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
 		builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180), encRight, motorPID.copy(), MotorInputType.SPEED, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
 		//builder.addDriveModule(new DriveModule(new XY(-13.75, 0), Angle.ZERO, maxSpeed, new Motor(new CANTalon(3)), new Motor(new CANTalon(4))));
 		//builder.addDriveModule(new DriveModule(new XY(13.75, 0), new Degrees(180), maxSpeed, new Motor(new CANTalon(1)), new Motor(new CANTalon(2))));
@@ -361,7 +365,7 @@ public class Robot extends SprocketRobot {
 		
 		builder.setInput(input);
 		builder.addStep(deadzone);
-		//builder.addStep(accelLimit);
+		//builder.addStep(accelLimi t);
 		//builder.addStep(visionStep);
 		builder.addStep(gCorrect);
 		
@@ -429,7 +433,7 @@ public class Robot extends SprocketRobot {
 		
 		//==================== REAL AUTO MODES ====================
 		double
-			STRAIGHT_DRIVE_A=-(110-36-22),//up to the peg
+			STRAIGHT_DRIVE_A=(110-36-22),//up to the peg
 			SIDE_DRIVE_A=-88,//first drive to the turn
 			SIDE_DRIVE_B=-(61.5-22),//from the turn to the peg
 			SIDE_DRIVE_C=-100;//after backing up, across the baseline
@@ -448,7 +452,7 @@ public class Robot extends SprocketRobot {
 		 * 4 inches
 		 */
 		
-		double FULL_SPEED=-0.8;
+		double FULL_SPEED=0.8;
 		
 		
 		super.addAutoMode(new AutoMode("Gear STRAIGHT Then Nothing Else", 
@@ -564,18 +568,23 @@ public class Robot extends SprocketRobot {
 		Debug.num("encRight inches", encRight.getInches().get());
 		Debug.num("encLeft inches", encLeft.getInches().get());
 		Debug.msg("gyroAngle", navX.get());
-		Debug.msg("limit-openLeft", openLeftSwitch.get());
-		Debug.msg("limit-oRight", openRightSwitch.get());
-		Debug.msg("limit-cLeft", closeLeftSwitch.get());
-		Debug.msg("limit-cRight", closeRightSwitch.get());
+		Debug.msg("limit-openLeft", gear.getLeftOpen());
+		Debug.msg("limit-openRight", gear.getRightOpen());
+		Debug.msg("limit-closeLeft", gear.getLeftClose());
+		Debug.msg("limit-closeRight", gear.getRightClose());
 		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
-		
+		boolean autoGear=auxStick.getThrottle() < 0.5;
 		//if(GEAR_MODE == 1 && super.isOperatorControl() && auxStick != null && gear != null) {
-			if(auxStick.getThrottle() < 0.5) {
-				gearMode=GEAR_MODE.AUTO;
-			} else {
-				gearMode=GEAR_MODE.MANUAL;
-			}
+		if(autoGear&&!lastAutoGear) {
+			gearMode=GEAR_MODE.AUTO;
+			gear.stop();
+		} 
+		if(!autoGear)
+		{
+			gearMode=GEAR_MODE.MANUAL;
+			//gear.stop();
+		}
+		lastAutoGear=autoGear;
 		//}
 		Debug.msg("Gear control mode", gearMode);
 		

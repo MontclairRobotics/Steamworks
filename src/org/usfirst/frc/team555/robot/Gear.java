@@ -28,13 +28,13 @@ public class Gear {
 	
 	public void openLimit()
 	{
-		if(!open1Switch.get()) {
+		if(!getLeftOpen()) {
 			m1.set(gearSpeed);;
 		} else {
 			m1.set(0.0);
 		}
 		
-		if(!open2Switch.get()) {
+		if(!getRightOpen()) {
 			m2.set(gearSpeed);
 		} else {
 			m2.set(0.0);
@@ -42,13 +42,13 @@ public class Gear {
 	}
 	public void closeLimit()
 	{
-		if(!close1Switch.get()) {
+		if(!getLeftClose()) {
 			m1.set(-gearSpeed);
 		} else {
 			m1.set(0.0);
 		}
 		
-		if(!close2Switch.get()) {
+		if(!getRightClose()) {
 			m2.set(-gearSpeed);
 		} else {
 			m2.set(0.0);
@@ -93,5 +93,21 @@ public class Gear {
 	
 	public void stop2() {
 		m2.set(0.0);
+	}
+	
+	public boolean getRightOpen() {
+		return !open2Switch.get();
+	}
+	
+	public boolean getLeftOpen() {
+		return open1Switch.get();
+	}
+	
+	public boolean getRightClose() {
+		return !close2Switch.get();
+	}
+	
+	public boolean getLeftClose() {
+		return close1Switch.get();
 	}
 }
