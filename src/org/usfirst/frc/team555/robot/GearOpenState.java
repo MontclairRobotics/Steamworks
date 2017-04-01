@@ -14,7 +14,7 @@ public class GearOpenState extends AutoState {
 	
 	@Override
 	public boolean isDone() {
-		return this.timeInState() > 1.0;
+		return (g.getRightOpen() && g.getLeftOpen()) || (timeInState() > 2.0);
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import org.montclairrobotics.sprocket.SprocketRobot;
 import org.montclairrobotics.sprocket.auto.AutoMode;
 import org.montclairrobotics.sprocket.auto.states.*;
 import org.montclairrobotics.sprocket.control.*;
+import org.montclairrobotics.sprocket.drive.ControlledMotor;
 import org.montclairrobotics.sprocket.drive.DriveModule;
 import org.montclairrobotics.sprocket.drive.DriveTrainBuilder;
 import org.montclairrobotics.sprocket.drive.DriveTrainType;
@@ -59,6 +60,9 @@ public class Robot extends SprocketRobot {
 		CloseSwitchRightID=7,
 		OpenSwitchRightID=6,
 		GearButtonID=1,
+		GearButtonAutoID=7,
+		GearButtonManualID=8,
+		GyroLockOff=3,
 		FieldCentricButtonID=2,
 		GyroLockButtonID=7,
 		ResetGyroID=3,
@@ -68,12 +72,16 @@ public class Robot extends SprocketRobot {
 		ManualOpen1=9,
 		ManualClose1=11,
 		ManualOpen2=10,
-		ManualClose2=12;
+		ManualClose2=12,
+		FullSpinButtonID=10;
 	
 
 	private static final Distance ENC_SPEED = new Distance(1);
 	private static final double MAX_ENC_ACCEL = 13;
 	private static final double MAX_ENC_TICKS = 25;
+
+	protected static final double FULL_SPIN_SPEED = 1;
+	protected static final double SLOW_SPIN_SPEED = 0.45;
 	
 	private static boolean lastAutoGear=true;
 	
@@ -86,8 +94,8 @@ public class Robot extends SprocketRobot {
 	private Motor gearLeftMotor, gearRightMotor;
 	private DigitalInput openLeftSwitch, closeLeftSwitch, openRightSwitch, closeRightSwitch;
 	
-	//private ControlledMotor ropeMotor1;
-	//private ControlledMotor ropeMotor2;
+	private ControlledMotor ropeMotor1;
+	private ControlledMotor ropeMotor2;
 	
 	private SEncoder encRight;
 	private SEncoder encLeft;
@@ -233,14 +241,14 @@ public class Robot extends SprocketRobot {
 		
 		
 		
-		/*
+		
 		//Rope climber motors
 		ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
 		ropeMotor1.constrain(0.0, 1.0);
 		ropeMotor1.getMotor().setInverted(true);
 		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
 		ropeMotor2.constrain(0.0, 1.0);
-		ropeMotor2.getMotor().setInverted(true);*/
+		ropeMotor2.getMotor().setInverted(true);
 		
 		
 		
@@ -289,7 +297,7 @@ public class Robot extends SprocketRobot {
 		
 		//DriveTrain joystick input
 		SquaredDriveInput input = new SquaredDriveInput(driveStick);//new ArcadeDriveInput(driveStick);
-		input.setXSensitivity(0.6);
+		input.setXSensitivity(SLOW_SPIN_SPEED);
 		
 		
 		//Gyro lock button
@@ -375,19 +383,50 @@ public class Robot extends SprocketRobot {
 			e.printStackTrace();
 		}
 		
-		Button resetButton= new JoystickButton(auxStick,7);
-		resetButton.setPressAction(new ButtonAction(){
+		Button gyroLockOff= new JoystickButton(auxStick,GyroLockOff);
+		gyroLockOff.setPressAction(new ButtonAction(){
 
 			@Override
 			public void onAction() {
 				gLock.disable();
-				gearMode=GEAR_MODE.MANUAL;
 			}});
+		
+		Button gearModeAuto=new JoystickButton(auxStick,GearButtonAutoID);
+		gearModeAuto.setPressAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				gearMode=GEAR_MODE.AUTO;
+			}});
+		Button gearModeManual=new JoystickButton(auxStick,GearButtonManualID);
+		gearModeManual.setPressAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				gearMode=GEAR_MODE.MANUAL;
+				gear.stop();
+			}});
+		
+		//FULL SPIN BUTTON
+		Button fullSpinButton=new JoystickButton(driveStick,FullSpinButtonID);
+		fullSpinButton.setPressAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				input.setXSensitivity(FULL_SPIN_SPEED);
+			}});
+		fullSpinButton.setReleaseAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				input.setXSensitivity(SLOW_SPIN_SPEED);
+			}});
+		
 		
 		//==================== AUTO SUBROUTINES ====================
 		
 		StateMachine dropGear=new StateMachine(
-				new DriveEncoders(22, 0.3, MAX_ENC_ACCEL, MAX_ENC_TICKS),
+				new DriveEncoders(20, 0.3, MAX_ENC_ACCEL, MAX_ENC_TICKS),
 				//new WiggleLeft(),
 				//new WiggleRight(),
 				new DriveTime(0.25,0.2),
@@ -434,9 +473,9 @@ public class Robot extends SprocketRobot {
 		//==================== REAL AUTO MODES ====================
 		double
 			STRAIGHT_DRIVE_A=(110-36-22),//up to the peg
-			SIDE_DRIVE_A=-88,//first drive to the turn
-			SIDE_DRIVE_B=-(61.5-22),//from the turn to the peg
-			SIDE_DRIVE_C=-100;//after backing up, across the baseline
+			SIDE_DRIVE_A=88-36,//first drive to the turn
+			SIDE_DRIVE_B=(61.5-22+16),//from the turn to the peg
+			SIDE_DRIVE_C=100;//after backing up, across the baseline
 		
 		
 		/*
@@ -575,20 +614,11 @@ public class Robot extends SprocketRobot {
 		//SmartDashboard.putNumber("MaxTurn",SprocketRobot.getDriveTrain().getMaxTurn().toDegrees());
 		boolean autoGear=auxStick.getThrottle() < 0.5;
 		//if(GEAR_MODE == 1 && super.isOperatorControl() && auxStick != null && gear != null) {
-		if(autoGear&&!lastAutoGear) {
-			gearMode=GEAR_MODE.AUTO;
-			gear.stop();
-		} 
-		if(!autoGear)
-		{
-			gearMode=GEAR_MODE.MANUAL;
-			//gear.stop();
-		}
-		lastAutoGear=autoGear;
+		
 		//}
 		Debug.msg("Gear control mode", gearMode);
 		
-		gear.gearSpeed = gearSpeedInput.get();
+		//gear.gearSpeed = gearSpeedInput.get();
 	}
 }
 
