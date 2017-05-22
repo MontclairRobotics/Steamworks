@@ -35,6 +35,7 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -104,6 +105,8 @@ public class Robot extends SprocketRobot {
 	
 	private Gear gear;
 	private DashboardInput gearSpeedInput;
+	
+	private PowerDistributionPanel pdp;
 
 	
 	@Override
@@ -383,6 +386,8 @@ public class Robot extends SprocketRobot {
 			e.printStackTrace();
 		}
 		
+		pdp = new PowerDistributionPanel();
+		
 		Button gyroLockOff= new JoystickButton(auxStick,GyroLockOff);
 		gyroLockOff.setPressAction(new ButtonAction(){
 
@@ -606,6 +611,10 @@ public class Robot extends SprocketRobot {
 		Debug.num("encLeft raw dist", encLeft.getTicks());
 		Debug.num("encRight inches", encRight.getInches().get());
 		Debug.num("encLeft inches", encLeft.getInches().get());
+		Debug.num("6-amps-pdp", pdp.getCurrent(13));
+		Debug.num("6-amps-talon", ((CANTalon)ropeMotor1.getMotor()).getOutputCurrent());
+		Debug.num("7-amps-pdp", pdp.getCurrent(14));
+		Debug.num("7-amps-talon", ((CANTalon)ropeMotor2.getMotor()).getOutputCurrent());
 		Debug.msg("gyroAngle", navX.get());
 		Debug.msg("limit-openLeft", gear.getLeftOpen());
 		Debug.msg("limit-openRight", gear.getRightOpen());
