@@ -478,8 +478,8 @@ public class Robot extends SprocketRobot {
 		//==================== REAL AUTO MODES ====================
 		double
 			STRAIGHT_DRIVE_A=(110-36-22),//up to the peg
-			SIDE_DRIVE_A=88-36,//first drive to the turn
-			SIDE_DRIVE_B=(61.5-22+16),//from the turn to the peg
+			SIDE_DRIVE_A=88-36,//first drive to the turn //52
+			SIDE_DRIVE_B=(61.5-22+16),//from the turn to the peg  //55.5
 			SIDE_DRIVE_C=100;//after backing up, across the baseline
 		
 		
@@ -496,7 +496,7 @@ public class Robot extends SprocketRobot {
 		 * 4 inches
 		 */
 		
-		double FULL_SPEED=0.8;
+		double FULL_SPEED=0.2;//0.8
 		
 		
 		super.addAutoMode(new AutoMode("Gear STRAIGHT Then Nothing Else", 
@@ -520,7 +520,15 @@ public class Robot extends SprocketRobot {
 				new DriveEncoderGyro(new Distance(-SIDE_DRIVE_B),new Degrees(-52),false, -FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				new DriveEncoderGyro(new Distance(SIDE_DRIVE_C),Angle.ZERO,false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
 		
-
+		super.addAutoMode(new AutoMode("SPENCER",
+				resetGyro,
+				new DriveEncoderGyro(new Distance(70), FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(55-22),new Degrees(52),false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				dropGear,
+				new DriveEncoderGyro(new Distance(-(55-22)),new Degrees(52),false, -FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(SIDE_DRIVE_C),Angle.ZERO,false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
+		super.addAutoMode(new AutoMode("Garrett",
+				dropGear));
 		//==================== EDITABLE TEST AUTO MODES ====================
 		DashboardInput
 			STRAIGHT_DRIVE_A_INPUT=new DashboardInput("STRAIGHT_DRIVE_A",STRAIGHT_DRIVE_A),//up to the peg
@@ -571,7 +579,7 @@ public class Robot extends SprocketRobot {
 				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
 				dropGear,
 				new DriveEncoderGyro(new DashboardInput("right-leg-1", 110-36-22), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect),
-				new TurnGyro(new DashboardInput("right-turn-1", -60), gCorrect, true),
+				new TurnGyro(new DashboardInput("right-turn-1", -60), g-Correct, true),
 				new DriveEncoderGyro(new DashboardInput("right-leg-2", -60), new DashboardInput("right-drive-speed", .35), maxEncAccel, maxEncTicksPerSec, gCorrect )
 						);
 		super.addAutoMode(gearRight);*/
@@ -612,9 +620,7 @@ public class Robot extends SprocketRobot {
 		Debug.num("encRight inches", encRight.getInches().get());
 		Debug.num("encLeft inches", encLeft.getInches().get());
 		Debug.num("6-amps-pdp", pdp.getCurrent(13));
-		Debug.num("6-amps-talon", ((CANTalon)ropeMotor1.getMotor()).getOutputCurrent());
 		Debug.num("7-amps-pdp", pdp.getCurrent(14));
-		Debug.num("7-amps-talon", ((CANTalon)ropeMotor2.getMotor()).getOutputCurrent());
 		Debug.msg("gyroAngle", navX.get());
 		Debug.msg("limit-openLeft", gear.getLeftOpen());
 		Debug.msg("limit-openRight", gear.getRightOpen());
