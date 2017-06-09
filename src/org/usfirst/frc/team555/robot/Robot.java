@@ -378,7 +378,7 @@ public class Robot extends SprocketRobot {
 		
 		builder.setInput(input);
 		builder.addStep(deadzone);
-		//builder.addStep(accelLimi t);
+		builder.addStep(accelLimit);
 		//builder.addStep(visionStep);
 		builder.addStep(gCorrect);
 		
