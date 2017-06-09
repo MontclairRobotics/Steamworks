@@ -107,6 +107,8 @@ public class Robot extends SprocketRobot {
 	private DashboardInput gearSpeedInput;
 	
 	private PowerDistributionPanel pdp;
+	
+	private AccelLimit accelLimit;
 
 	
 	@Override
@@ -260,7 +262,7 @@ public class Robot extends SprocketRobot {
 		
 		Deadzone deadzone=new Deadzone();
 		
-		AccelLimit accelLimit=new AccelLimit(4,16);
+		accelLimit=new AccelLimit(4,16);
 		
 		/*
 		//Full speed button
@@ -282,7 +284,7 @@ public class Robot extends SprocketRobot {
 		navX = new NavXRollInput(Port.kMXP);
 		PID gyroPID = new PID(0.18*13.75,0,.0003*13.75);
 		gyroPID.setInput(navX);
-		GyroCorrection gCorrect=new GyroCorrection(navX,gyroPID);
+		GyroCorrection gCorrect=new GyroCorrection(navX,gyroPID,20,0.25);
 		GyroLock gLock = new GyroLock(gCorrect);
 		
 		new JoystickButton(driveStick, LeftButtonID).setPressAction(new ButtonAction() {
@@ -527,8 +529,20 @@ public class Robot extends SprocketRobot {
 				dropGear,
 				new DriveEncoderGyro(new Distance(-(55-22)),new Degrees(52),false, -FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				new DriveEncoderGyro(new Distance(SIDE_DRIVE_C),Angle.ZERO,false, FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
-		super.addAutoMode(new AutoMode("Garrett",
-				dropGear));
+		
+		super.addAutoMode(new AutoMode("Drive Forward 14 ft",
+				resetGyro,
+				new DriveEncoderGyro(new Distance(14*12), FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
+		
+		super.addAutoMode(new AutoMode("6-90-2",
+				resetGyro,
+				new DriveEncoderGyro(new Distance(6*12), FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(2*12), new Degrees (90), false, FULL_SPEED, MAX_ENC_ACCEL,MAX_ENC_TICKS,gCorrect)));
+		super.addAutoMode(new AutoMode("Random Test",
+				resetGyro,
+				new DriveEncoderGyro(new Distance(52), FULL_SPEED, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
+				new DriveEncoderGyro(new Distance(72-17), new Degrees (60), false, FULL_SPEED, MAX_ENC_ACCEL,MAX_ENC_TICKS,gCorrect)));
+		
 		//==================== EDITABLE TEST AUTO MODES ====================
 		DashboardInput
 			STRAIGHT_DRIVE_A_INPUT=new DashboardInput("STRAIGHT_DRIVE_A",STRAIGHT_DRIVE_A),//up to the peg
@@ -562,7 +576,7 @@ public class Robot extends SprocketRobot {
 				dropGear,
 				new DriveEncoderGyro(Input.neg(SIDE_DRIVE_B_INPUT),inputNeg60,false, Input.neg(FULL_SPEED_INPUT), MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect),
 				new DriveEncoderGyro(SIDE_DRIVE_C_INPUT,zeroInput,false, FULL_SPEED_INPUT, MAX_ENC_ACCEL, MAX_ENC_TICKS, gCorrect)));
-				
+
 		
 		/*AutoMode gearLeft = new AutoMode("Gear left peg",
 				new DriveEncoderGyro(new DashboardInput("left-leg-1", 110-36-22), new DashboardInput("left-drive-speed", 0.35), maxEncAccel, maxEncTicksPerSec, gCorrect),
@@ -635,5 +649,16 @@ public class Robot extends SprocketRobot {
 		
 		//gear.gearSpeed = gearSpeedInput.get();
 	}
+	
+	@Override
+	public void userAutonomousInit() {
+		accelLimit.disable();
+	}
+	
+	@Override
+	public void userTeleopInit() {
+		accelLimit.enable();
+	}
+	
 }
 
