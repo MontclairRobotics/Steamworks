@@ -19,6 +19,7 @@ import org.montclairrobotics.sprocket.geometry.Angle;
 import org.montclairrobotics.sprocket.geometry.Degrees;
 import org.montclairrobotics.sprocket.geometry.Distance;
 import org.montclairrobotics.sprocket.geometry.XY;
+import org.montclairrobotics.sprocket.loop.Updater;
 import org.montclairrobotics.sprocket.motors.Motor;
 import org.montclairrobotics.sprocket.motors.SEncoder;
 import org.montclairrobotics.sprocket.states.State;
@@ -58,12 +59,12 @@ public class Robot extends SprocketRobot {
 		AuxStickID=1,
 		CloseSwitchLeftID=0,//limit switches
 		OpenSwitchLeftID=1,
-		CloseSwitchRightID=7,
+		CloseSwitchRightID=7,//%Better comments
 		OpenSwitchRightID=6,
 		GearButtonID=1,
 		GearButtonAutoID=7,
 		GearButtonManualID=8,
-		GyroLockOff=3,
+		GyroLockOff=6,
 		FieldCentricButtonID=2,
 		GyroLockButtonID=7,
 		ResetGyroID=3,
@@ -74,7 +75,9 @@ public class Robot extends SprocketRobot {
 		ManualClose1=11,
 		ManualOpen2=10,
 		ManualClose2=12,
-		FullSpinButtonID=10;
+		FullSpinButtonID=10,
+		ClimbFastID=5,
+		ClimbSlowID=3;
 	
 
 	private static final Distance ENC_SPEED = new Distance(1);
@@ -83,6 +86,8 @@ public class Robot extends SprocketRobot {
 
 	protected static final double FULL_SPIN_SPEED = 1;
 	protected static final double SLOW_SPIN_SPEED = 0.45;
+
+	protected static final double SPINNY_POWER = 1;
 	
 	private static boolean lastAutoGear=true;
 	
@@ -95,8 +100,11 @@ public class Robot extends SprocketRobot {
 	private Motor gearLeftMotor, gearRightMotor;
 	private DigitalInput openLeftSwitch, closeLeftSwitch, openRightSwitch, closeRightSwitch;
 	
-	private ControlledMotor ropeMotor1;
-	private ControlledMotor ropeMotor2;
+	private Motor ropeMotor1;
+	private Motor ropeMotor2;
+	
+	private Motor ballSpinny;
+	private Motor ballShooty;
 	
 	private SEncoder encRight;
 	private SEncoder encLeft;
@@ -109,6 +117,8 @@ public class Robot extends SprocketRobot {
 	private PowerDistributionPanel pdp;
 	
 	private AccelLimit accelLimit;
+
+	private double shootStartTime;
 
 	
 	@Override
@@ -248,15 +258,94 @@ public class Robot extends SprocketRobot {
 		
 		
 		//Rope climber motors
-		ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
+		/*ropeMotor1 = new ControlledMotor(new CANTalon(6), new JoystickYAxis(auxStick));
 		ropeMotor1.constrain(0.0, 1.0);
 		ropeMotor1.getMotor().setInverted(true);
 		ropeMotor2 = new ControlledMotor(new CANTalon(7), new JoystickYAxis(auxStick));
 		ropeMotor2.constrain(0.0, 1.0);
+		ropeMotor2.getMotor().setInverted(true);*/
+		
+		ropeMotor1=new Motor(new CANTalon(6));
+		ropeMotor2=new Motor(new CANTalon(7));
+		ropeMotor1.getMotor().setInverted(true);
 		ropeMotor2.getMotor().setInverted(true);
+		setClimbSpeed(0);
+				
+		Button climbFast=new JoystickButton(auxStick,ClimbFastID);
+		Button climbSlow=new JoystickButton(auxStick,ClimbSlowID);
 		
+		climbFast.setHeldAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				setClimbSpeed(1);
+			}});
+		climbFast.setReleaseAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				setClimbSpeed(0);
+			}});
+		climbSlow.setHeldAction(new ButtonAction(){
+
+				@Override
+				public void onAction() {
+					setClimbSpeed(0.5);
+				}});
+		climbSlow.setReleaseAction(new ButtonAction(){
+
+				@Override
+				public void onAction() {
+					setClimbSpeed(0);
+				}});
 		
+		//Shooter motors
+		ballSpinny=new Motor(new CANTalon(000000000000000000000000000000000000000000000000000000000000000000000));
+		ballShooty=new Motor(new CANTalon(000000000000000000000000000000000000000000000000000000000000000000000));
 		
+		//Shooter Triggers
+		Button shootTrigger=new JoystickButton(auxStick,0);
+		Button agitatorOverride=new JoystickButton(auxStick,4);
+		
+		shootTrigger.setHeldAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				ballShooty.set(getShootSpeed());
+				if(Updater.getTime()-shootStartTime>2)
+				{
+					ballSpinny.set(SPINNY_POWER);
+				}
+			}});
+		shootTrigger.setPressAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				shootStartTime=Updater.getTime();
+			}});
+		shootTrigger.setOffAction(new ButtonAction(){
+			@Override
+			public void onAction() {
+				ballShooty.set(0);
+			}});
+		shootTrigger.setReleaseAction(new ButtonAction(){
+			@Override
+			public void onAction() {
+				ballSpinny.set(0);
+			}});
+		
+		agitatorOverride.setPressAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				ballSpinny.set(SPINNY_POWER);
+			}});
+		agitatorOverride.setReleaseAction(new ButtonAction(){
+
+			@Override
+			public void onAction() {
+				ballSpinny.set(0);
+			}});
 
 		//input.setSensitivity(0.5, 0.3);
 		
@@ -621,7 +710,7 @@ public class Robot extends SprocketRobot {
 		super.sendAutoModes();
 		
 	}
-	
+
 	public void update()
 	{
 		//Debug.msg("Close switch", closeSwitch.get() ? "true" : "false");
@@ -648,6 +737,17 @@ public class Robot extends SprocketRobot {
 		Debug.msg("Gear control mode", gearMode);
 		
 		//gear.gearSpeed = gearSpeedInput.get();
+	}
+	
+	public void setClimbSpeed(double spd)
+	{
+		ropeMotor1.set(spd);
+		ropeMotor2.set(spd);
+	}
+	
+	public double getShootSpeed() {
+		// TODO Auto-generated method stub
+		return 0.75+0.25*auxStick.getY();
 	}
 	
 	@Override
