@@ -284,7 +284,7 @@ public class Robot extends SprocketRobot {
 		navX = new NavXRollInput(Port.kMXP);
 		PID gyroPID = new PID(0.18*13.75,0,.0003*13.75);
 		gyroPID.setInput(navX);
-		GyroCorrection gCorrect=new GyroCorrection(navX,gyroPID,10,0.5);
+		GyroCorrection gCorrect=new GyroCorrection(navX,gyroPID,20,0.3*20);
 		GyroLock gLock = new GyroLock(gCorrect);
 		
 		new JoystickButton(driveStick, LeftButtonID).setPressAction(new ButtonAction() {
