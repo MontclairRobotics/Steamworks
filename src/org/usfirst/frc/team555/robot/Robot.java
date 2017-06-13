@@ -300,8 +300,8 @@ public class Robot extends SprocketRobot {
 				}});
 		
 		//Shooter motors
-		ballSpinny=new Motor(new CANTalon(000000000000000000000000000000000000000000000000000000000000000000000));
-		ballShooty=new Motor(new CANTalon(000000000000000000000000000000000000000000000000000000000000000000000));
+		ballSpinny=new Motor(new CANTalon(9));
+		ballShooty=new Motor(new CANTalon(10));
 		
 		//Shooter Triggers
 		Button shootTrigger=new JoystickButton(auxStick,0);
@@ -312,7 +312,7 @@ public class Robot extends SprocketRobot {
 			@Override
 			public void onAction() {
 				ballShooty.set(getShootSpeed());
-				if(Updater.getTime()-shootStartTime>2)
+				if(Updater.getTime()-shootStartTime>1)
 				{
 					ballSpinny.set(SPINNY_POWER);
 				}
